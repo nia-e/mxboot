@@ -1,2 +1,5 @@
 [target.aarch64-unknown-linux-musl]
 linker = "/usr/bin/aarch64-linux-musl-ld"
+
+[env]
+DEP_LV_CONFIG_PATH = { value = "include", relative = true }
