@@ -1,5 +1,7 @@
 use anyhow::Result;
+#[cfg(target_arch = "aarch64")]
 use framebuffer::Framebuffer;
+#[cfg(target_arch = "aarch64")]
 use std::process::Command;
 #[cfg(target_arch = "aarch64")]
 use syscalls::{
@@ -13,6 +15,7 @@ pub mod video;
 static RB_AUTOBOOT: usize = 0x1234567; // Reboot syscall magic
 
 fn main() -> Result<()> {
+    #[cfg(target_arch = "aarch64")]
     match Framebuffer::new("/dev/FIXME") {
         Ok(fb) => match video::init::init_fb(fb) {
             Ok(_) => (),
@@ -22,14 +25,16 @@ fn main() -> Result<()> {
             eprintln!("{e}\nmxboot failed to initialize framebuffer. Booting previously set OS...")
         }
     }
+    #[cfg(not(target_arch = "aarch64"))]
+    if let Err(e) = video::mock_init::mock_init_fb() {
+        eprintln!("{:?}", e);
+    }
 
-    // Set boot as valid; if this fails, no clear behavior except crashing
-    let _ = Command::new("qbootctl").arg("-m").output()?;
-    // Get current slot
-    let slot = Command::new("qbootctl").arg("-c").output()?.stdout;
-    let new_slot = if "a".as_bytes().eq(&slot) { "b" } else { "a" };
-    // Switch slot
-    let _ = Command::new("qbootctl").arg("-s").arg(new_slot).output()?;
+    // Set boot as valid; if this fails, carry on
+    #[cfg(target_arch = "aarch64")]
+    if let Err(e) = Command::new("qbootctl").arg("-m").output() {
+        eprintln!("{e}");
+    }
 
     #[cfg(target_arch = "aarch64")]
     unsafe {

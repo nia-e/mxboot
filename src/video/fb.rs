@@ -1,8 +1,9 @@
-use std::num::TryFromIntError;
+#![cfg(target_arch = "aarch64")]
 
+use std::num::TryFromIntError;
 use anyhow::Result;
 use thiserror::Error;
-use framebuffer::{Framebuffer, KdMode, FramebufferError};
+use framebuffer::{Framebuffer, KdMode};
 use embedded_graphics::{prelude::*, draw_target::DrawTarget, pixelcolor::Rgb888};
 
 #[derive(Error, Debug)]
@@ -35,16 +36,6 @@ impl DrawableFramebuffer {
 
     pub fn flush(&mut self) {
         self.fb_dev.write_frame(&self.frame)
-    }
-}
-
-impl Drop for DrawableFramebuffer {
-    fn drop(&mut self) {
-        self.flush();
-        match Framebuffer::set_kd_mode(KdMode::Text) {
-            Ok(_) => (),
-            Err(e) => eprintln!("{e}")
-        }
     }
 }
 
@@ -91,5 +82,15 @@ impl DrawTarget for DrawableFramebuffer {
 impl OriginDimensions for DrawableFramebuffer {
     fn size(&self) -> Size {
         Size::new(self.fb_dev.var_screen_info.width, self.fb_dev.var_screen_info.height)
+    }
+}
+
+impl Drop for DrawableFramebuffer {
+    fn drop(&mut self) {
+        self.flush();
+        match Framebuffer::set_kd_mode(KdMode::Text) {
+            Ok(_) => (),
+            Err(e) => eprintln!("{e}")
+        }
     }
 }
