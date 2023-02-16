@@ -7,7 +7,7 @@ edition = "2021"
 anyhow = "1.0.69"
 thiserror = "1.0.38"
 embedded-graphics = "0.7.1"
-lvgl = "0.5.2"
+lvgl = { git = "https://github.com/nia-e/lvgl-rs.git" }
 
 [target.'cfg(target_arch = "aarch64")'.dependencies]
 syscalls = { version = "0.6.7", features = ["aarch64"], default-features = false }
