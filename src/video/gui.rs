@@ -18,7 +18,7 @@ where
 {
     let mut ui = UI::init()?;
     ui.disp_drv_register(display)?;
-    let mut screen = ui.scr_act()?;
+    let screen = ui.scr_act()?;
 
     // Styling, TODO: implement unl0kr's theme.
     let mut screen_style = Style::default();
