@@ -30,7 +30,7 @@ fn main() -> Result<()> {
         eprintln!("{:?}", e);
     }
 
-    // Set boot as valid; if this fails, carry on
+    // Set boot as valid; if this fails, it's ok to carry on
     #[cfg(target_arch = "aarch64")]
     if let Err(e) = Command::new("qbootctl").arg("-m").output() {
         eprintln!("{e}");
@@ -40,6 +40,7 @@ fn main() -> Result<()> {
     unsafe {
         match syscall(sync, &syscall_args!()) {
             Ok(_) => (),
+            // Not *super* sure it's ok to reboot but whatever
             Err(e) => eprintln!("{e}\nmxboot failed to sync(2). Attempting reboot anyways"),
         }
 

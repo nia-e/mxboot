@@ -12,12 +12,16 @@ pub enum DrawableFbError {
     BogusPanel(TryFromIntError)
 }
 
+/// A wrapper around framebuffer's Framebuffer type, impl'ing the trait
+/// embedded-graphics (and therefore LVGL) uses to talk to displays.
+/// self.flush() must be called to write the frame to the framebuffer.
 pub struct DrawableFramebuffer {
     pub frame: Vec<u8>,
     fb_dev: Framebuffer
 }
 
 impl DrawableFramebuffer {
+    /// Instantiates a DrawableFramebuffer from a given framebuffer device.
     pub fn new(fb_dev: Framebuffer) -> Result<DrawableFramebuffer> {
         let h = fb_dev.var_screen_info.yres;
         let line_length = fb_dev.fix_screen_info.line_length;
@@ -34,6 +38,7 @@ impl DrawableFramebuffer {
         })
     }
 
+    /// Writes self.frame into the framebuffer device proper.
     pub fn flush(&mut self) {
         self.fb_dev.write_frame(&self.frame)
     }
@@ -47,6 +52,8 @@ impl DrawTarget for DrawableFramebuffer {
     fn draw_iter<I>(&mut self, pixels: I) -> Result<(), Self::Error>
     where
         I: IntoIterator<Item = Pixel<Self::Color>> {
+            // None of these should ever fail, realistically, but there may be
+            // errors while reading so it's worth at least gracefully exiting.
             let w: i32 = match self.fb_dev.var_screen_info.width.try_into() {
                 Ok(w) => w,
                 Err(e) => return Err(Self::Error::BogusPanel(e))
@@ -62,7 +69,8 @@ impl DrawTarget for DrawableFramebuffer {
             let bytespp: i32 = match (self.fb_dev.var_screen_info.bits_per_pixel / 8).try_into() {
                 Ok(b) => b,
                 Err(e) => return Err(Self::Error::BogusPanel(e))
-            }; // Should be 3 but better to draw *something approximately ok* than fail entirely otherwise
+            }; // Should be 3 but better to draw *something approximately ok*
+               // to than fail entirely otherwise.
 
             for Pixel(coord, color) in pixels.into_iter() {
                 if coord.x < w && coord.x >= 0 && coord.y < h && coord.y >= 0 {
@@ -86,6 +94,7 @@ impl OriginDimensions for DrawableFramebuffer {
 }
 
 impl Drop for DrawableFramebuffer {
+    // Ensure that we don't stay in graphics mode after dropping the handle
     fn drop(&mut self) {
         self.flush();
         match Framebuffer::set_kd_mode(KdMode::Text) {
