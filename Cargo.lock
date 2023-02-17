@@ -552,6 +552,7 @@ dependencies = [
  "embedded-graphics-simulator",
  "framebuffer",
  "lvgl",
+ "lvgl-sys",
  "syscalls",
  "thiserror",
 ]

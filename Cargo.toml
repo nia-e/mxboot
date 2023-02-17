@@ -8,6 +8,7 @@ anyhow = "1.0.69"
 thiserror = "1.0.38"
 embedded-graphics = "0.7.1"
 lvgl = { git = "https://github.com/rafaelcaricio/lvgl-rs", commit = "6d4de8b" }
+lvgl-sys = { git = "https://github.com/rafaelcaricio/lvgl-rs", commit = "6d4de8b" }
 
 [target.'cfg(target_arch = "aarch64")'.dependencies]
 syscalls = { version = "0.6.7", features = ["aarch64"], default-features = false }

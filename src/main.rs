@@ -9,7 +9,7 @@ use syscalls::{
     syscall, syscall_args,
 };
 
-pub mod video;
+mod video;
 
 #[cfg(target_arch = "aarch64")]
 static RB_AUTOBOOT: usize = 0x1234567; // Reboot syscall magic
@@ -45,7 +45,7 @@ fn main() -> Result<()> {
 
         match syscall(reboot, &syscall_args!(RB_AUTOBOOT)) {
             Ok(_) => (),
-            Err(e) => panic!("{e}\nmxboot failed to reboot system. Exiting...")
+            Err(e) => panic!("{e}\nmxboot failed to reboot(2). Exiting...")
         }
     }
     Ok(())
