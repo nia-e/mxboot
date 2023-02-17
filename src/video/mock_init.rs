@@ -1,10 +1,12 @@
 #![cfg(not(target_arch = "aarch64"))]
 
-use anyhow::Result;
-use embedded_graphics::{prelude::*, pixelcolor::Rgb565};
-use embedded_graphics_simulator::{SimulatorDisplay, OutputSettingsBuilder, Window, SimulatorEvent};
-use lvgl::LvError;
 use super::gui::load_gui;
+use anyhow::Result;
+use embedded_graphics::{pixelcolor::Rgb565, prelude::*};
+use embedded_graphics_simulator::{
+    OutputSettingsBuilder, SimulatorDisplay, SimulatorEvent, Window,
+};
+use lvgl::LvError;
 
 pub fn mock_init_fb() -> Result<(), LvError> {
     // For some reason Rgb888 is broken. TODO: Figure out why this is

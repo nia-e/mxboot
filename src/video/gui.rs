@@ -1,16 +1,21 @@
 use anyhow::Result;
-use embedded_graphics::prelude::*;
-use lvgl::{UI, LvError, style::Style, State, Color, Widget, Part};
-use std::{time::Duration, thread::sleep};
-#[cfg(not(target_arch = "aarch64"))]
-use std::mem::transmute;
-#[cfg(not(target_arch = "aarch64"))]
-use embedded_graphics_simulator::{Window, SimulatorEvent};
 #[cfg(not(target_arch = "aarch64"))]
 use embedded_graphics::pixelcolor::Rgb565;
+use embedded_graphics::prelude::*;
+#[cfg(not(target_arch = "aarch64"))]
+use embedded_graphics_simulator::{SimulatorEvent, Window};
+use lvgl::{style::Style, Color, LvError, Part, State, Widget, UI};
+#[cfg(not(target_arch = "aarch64"))]
+use std::mem::transmute;
+use std::{thread::sleep, time::Duration};
 
-pub(crate) fn load_gui<D: DrawTarget + OriginDimensions, T>(display: D, mut window: Option<T>) -> Result<(), LvError>
-where <D as DrawTarget>::Color: From<Color> {
+pub(crate) fn load_gui<D: DrawTarget + OriginDimensions, T>(
+    display: D,
+    mut window: Option<T>,
+) -> Result<(), LvError>
+where
+    <D as DrawTarget>::Color: From<Color>,
+{
     let mut ui = UI::init()?;
     ui.disp_drv_register(display)?;
     let mut screen = ui.scr_act()?;
@@ -31,7 +36,9 @@ where <D as DrawTarget>::Color: From<Color> {
             let w: &mut Window = transmute(window.as_mut().unwrap());
             w.update::<Rgb565>(transmute(ui.get_display_ref().unwrap()));
             for event in w.events() {
-                if event == SimulatorEvent::Quit { break 'running }
+                if event == SimulatorEvent::Quit {
+                    break 'running;
+                }
             }
         }
         sleep(Duration::from_millis(16));

@@ -46,7 +46,7 @@ fn main() -> Result<()> {
 
         match syscall(reboot, &syscall_args!(RB_AUTOBOOT)) {
             Ok(_) => (),
-            Err(e) => panic!("{e}\nmxboot failed to reboot(2). Exiting...")
+            Err(e) => panic!("{e}\nmxboot failed to reboot(2). Exiting..."),
         }
     }
     Ok(())
