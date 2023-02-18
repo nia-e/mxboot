@@ -12,7 +12,7 @@ pub enum DrawableFbError {
     BogusPanel(TryFromIntError),
 }
 
-/// A wrapper around framebuffer's Framebuffer type, impl'ing the trait
+/// A wrapper around framebuffer's Framebuffer type, `impl`'ing the trait
 /// embedded-graphics (and therefore LVGL) uses to talk to displays.
 /// self.flush() must be called to write the frame to the framebuffer.
 pub struct DrawableFramebuffer {

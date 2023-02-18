@@ -5,6 +5,7 @@ use super::gui::load_gui;
 use anyhow::Result;
 use framebuffer::Framebuffer;
 
+/// Initialize the display, given a framebuffer device.
 pub fn init_fb(fb: Framebuffer) -> Result<()> {
     let mut fb = DrawableFramebuffer::new(fb)?;
     // Code Crimes(tm) have been done here to reduce executable size on aarch64

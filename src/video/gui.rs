@@ -11,7 +11,15 @@ use embedded_graphics::prelude::*;
 use lvgl::{style::Style, widgets, Align, Color, Event, LvError, Part, State, Widget, UI};
 use std::{thread::sleep, time::Duration};
 
-pub(crate) unsafe fn load_gui<D: DrawTarget + OriginDimensions, T>(
+/// Loads the actual GUI on the display.
+/// 
+/// # Safety
+/// 
+/// If the target is aarch64, window must be an object of type
+/// `embedded_graphics_simulator::Window`. This is not enforced by the
+/// typesystem as that would require pulling in `embedded_graphics_simulator`
+/// on aarch64 builds, increasing executable size.
+pub unsafe fn load_gui<D: DrawTarget + OriginDimensions, T>(
     display: D,
     mut window: Option<T>,
 ) -> Result<(), LvError>
@@ -29,7 +37,7 @@ where
     screen.add_style(Part::Main, screen_style)?;
 
     let mut button = widgets::Btn::new(&mut screen)?;
-    button.set_align(&mut screen, Align::Center, 0, 0)?;
+    button.set_align(&mut screen, Align::InTopMid, 0, 0)?;
     button.set_size(200, 100)?;
     let mut label = widgets::Label::new(&mut button)?;
     label.set_text(CString::new("Click me!").unwrap().as_c_str())?;
