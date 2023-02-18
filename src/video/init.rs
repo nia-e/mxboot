@@ -10,10 +10,12 @@ pub fn init_fb(fb: Framebuffer) -> Result<()> {
     // Code Crimes(tm) have been done here to reduce executable size on aarch64
     // so we don't pull in the embedded_graphics_simulator crate. The None is
     // entirely unused.
-    match load_gui(fb, None::<u8>) {
-        Ok(_) => (),
-        Err(e) => {
-            eprintln!("{:?}", e);
+    unsafe {
+        match load_gui(fb, None::<u8>) {
+            Ok(_) => (),
+            Err(e) => {
+                eprintln!("{:?}", e);
+            }
         }
     }
     Ok(())

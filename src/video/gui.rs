@@ -1,15 +1,17 @@
-use anyhow::Result;
 #[cfg(not(target_arch = "aarch64"))]
 use embedded_graphics::pixelcolor::Rgb565;
-use embedded_graphics::prelude::*;
 #[cfg(not(target_arch = "aarch64"))]
 use embedded_graphics_simulator::{SimulatorEvent, Window};
-use lvgl::{style::Style, Color, LvError, Part, State, Widget, UI};
 #[cfg(not(target_arch = "aarch64"))]
 use std::mem::transmute;
+
+use anyhow::Result;
+use cstr_core::CString;
+use embedded_graphics::prelude::*;
+use lvgl::{style::Style, widgets, Align, Color, Event, LvError, Part, State, Widget, UI};
 use std::{thread::sleep, time::Duration};
 
-pub(crate) fn load_gui<D: DrawTarget + OriginDimensions, T>(
+pub(crate) unsafe fn load_gui<D: DrawTarget + OriginDimensions, T>(
     display: D,
     mut window: Option<T>,
 ) -> Result<(), LvError>
@@ -18,13 +20,26 @@ where
 {
     let mut ui = UI::init()?;
     ui.disp_drv_register(display)?;
-    let screen = ui.scr_act()?;
+    let mut screen = ui.scr_act()?;
 
     // Styling, TODO: implement unl0kr's theme.
     let mut screen_style = Style::default();
     screen_style.set_bg_color(State::DEFAULT, Color::from_rgb((255, 255, 255)));
     screen_style.set_radius(State::DEFAULT, 0);
     screen.add_style(Part::Main, screen_style)?;
+
+    let mut button = widgets::Btn::new(&mut screen)?;
+    button.set_align(&mut screen, Align::Center, 0, 0)?;
+    button.set_size(200, 100)?;
+    let mut label = widgets::Label::new(&mut button)?;
+    label.set_text(CString::new("Click me!").unwrap().as_c_str())?;
+
+    button.on_event(|mut btn, event| {
+        if let lvgl::Event::Clicked = event {
+            println!("Clicked");
+            btn.toggle().unwrap();
+        }
+    })?;
 
     'running: loop {
         ui.task_handler();
@@ -36,8 +51,12 @@ where
             let w: &mut Window = transmute(window.as_mut().unwrap());
             w.update::<Rgb565>(transmute(ui.get_display_ref().unwrap()));
             for event in w.events() {
-                if event == SimulatorEvent::Quit {
-                    break 'running;
+                match event {
+                    SimulatorEvent::MouseButtonUp { .. } => {
+                        ui.event_send(&mut button, Event::Clicked)?
+                    }
+                    SimulatorEvent::Quit => break 'running,
+                    _ => {}
                 }
             }
         }
