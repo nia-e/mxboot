@@ -7,3 +7,4 @@ pub mod init;
 pub mod mock_init;
 
 pub mod gui;
+pub mod theme;

@@ -2,4 +2,4 @@
 linker = "/usr/bin/aarch64-linux-musl-ld"
 
 [env]
-DEP_LV_CONFIG_PATH = { value = "include", relative = true }
+DEP_LV_CONFIG_PATH = { value = "config", relative = true }

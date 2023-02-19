@@ -10,11 +10,12 @@ use cstr_core::CString;
 use embedded_graphics::prelude::*;
 use lvgl::{style::Style, widgets, Align, Color, Event, LvError, Part, State, Widget, UI};
 use std::{thread::sleep, time::Duration};
+use super::theme::MxTheme;
 
 /// Loads the actual GUI on the display.
-/// 
+///
 /// # Safety
-/// 
+///
 /// If the target is aarch64, window must be an object of type
 /// `embedded_graphics_simulator::Window`. This is not enforced by the
 /// typesystem as that would require pulling in `embedded_graphics_simulator`
