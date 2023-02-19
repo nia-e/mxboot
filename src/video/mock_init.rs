@@ -12,7 +12,7 @@ pub fn mock_init_fb() -> Result<(), LvError> {
     let mock_display: SimulatorDisplay<Rgb565> = SimulatorDisplay::new(Size::new(1080, 2160));
     let output_settings = OutputSettingsBuilder::new().build();
     let window = Window::new("Test", &output_settings);
-    // Some(window) for code crimes. See init.rs:10
+    // Some(window) for code crimes. See init.rs:11
     unsafe { load_gui(mock_display, Some(window))? }
     Ok(())
 }

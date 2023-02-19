@@ -12,16 +12,16 @@ pub enum DrawableFbError {
     BogusPanel(TryFromIntError),
 }
 
-/// A wrapper around framebuffer's Framebuffer type, `impl`'ing the trait
+/// A wrapper around framebuffer's `Framebuffer` type, `impl`ing the trait
 /// embedded-graphics (and therefore LVGL) uses to talk to displays.
-/// self.flush() must be called to write the frame to the framebuffer.
+/// `self.flush()` must be called to write the frame to the framebuffer.
 pub struct DrawableFramebuffer {
     pub frame: Vec<u8>,
     fb_dev: Framebuffer,
 }
 
 impl DrawableFramebuffer {
-    /// Instantiates a DrawableFramebuffer from a given framebuffer device.
+    /// Instantiates a `DrawableFramebuffer` from a given framebuffer device.
     pub fn new(fb_dev: Framebuffer) -> Result<DrawableFramebuffer> {
         let h = fb_dev.var_screen_info.yres;
         let line_length = fb_dev.fix_screen_info.line_length;
@@ -35,7 +35,7 @@ impl DrawableFramebuffer {
         Ok(DrawableFramebuffer { frame, fb_dev })
     }
 
-    /// Writes self.frame into the framebuffer device proper.
+    /// Writes `self.frame` into the framebuffer device proper.
     pub fn flush(&mut self) {
         self.fb_dev.write_frame(&self.frame)
     }
@@ -68,7 +68,7 @@ impl DrawTarget for DrawableFramebuffer {
             Ok(b) => b,
             Err(e) => return Err(Self::Error::BogusPanel(e)),
         }; // Should be 3 but better to draw *something approximately ok*
-           // to than fail entirely otherwise.
+           // than to fail entirely otherwise.
 
         for Pixel(coord, color) in pixels.into_iter() {
             if coord.x < w && coord.x >= 0 && coord.y < h && coord.y >= 0 {

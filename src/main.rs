@@ -11,9 +11,9 @@ use syscalls::{
 
 mod video;
 
-/// Linux reboot(2) syscall magic for system restart.
+/// Linux `reboot(2)` syscall magic for system restart.
 #[cfg(target_arch = "aarch64")]
-static RB_AUTOBOOT: usize = 0x1234567;
+const RB_AUTOBOOT: usize = 0x1234567;
 
 fn main() -> Result<()> {
     #[cfg(target_arch = "aarch64")]
