@@ -8,7 +8,7 @@ use std::mem::transmute;
 use anyhow::Result;
 use cstr_core::CString;
 use embedded_graphics::prelude::*;
-use lvgl::{style::Style, widgets, Align, Color, Event, LvError, Part, State, Widget, UI};
+use lvgl::{widgets, Align, Color, Event, LvError, Part, Widget, UI};
 use std::{thread::sleep, time::Duration};
 use super::theme::MxTheme;
 
@@ -30,16 +30,15 @@ where
     let mut ui = UI::init()?;
     ui.disp_drv_register(display)?;
     let mut screen = ui.scr_act()?;
+    let theme = MxTheme::pmos_dark();
 
-    // Styling, TODO: implement unl0kr's theme.
-    let mut screen_style = Style::default();
-    screen_style.set_bg_color(State::DEFAULT, Color::from_rgb((255, 255, 255)));
-    screen_style.set_radius(State::DEFAULT, 0);
-    screen.add_style(Part::Main, screen_style)?;
+    // Styling, TODO: finish implementing unl0kr's theme.
+    screen.add_style(Part::Main, theme.style_window())?;
 
     let mut button = widgets::Btn::new(&mut screen)?;
     button.set_align(&mut screen, Align::InTopMid, 0, 0)?;
     button.set_size(200, 100)?;
+    button.add_style(Part::Main, theme.style_button())?;
     let mut label = widgets::Label::new(&mut button)?;
     label.set_text(CString::new("Click me!").unwrap().as_c_str())?;
 

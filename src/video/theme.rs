@@ -1,7 +1,9 @@
 // Themes from https://gitlab.com/cherrypicker/unl0kr/-/blob/master/themes.c
 // (c) 2021 Johannes Marbach for the original theme
 
-use lvgl::{style::Style, Color, State};
+#![allow(dead_code)]
+
+use lvgl::{style::{Style, Opacity}, Color, State};
 
 #[repr(i16)]
 enum BorderSide {
@@ -14,140 +16,144 @@ enum BorderSide {
     Internal = 0x10
 }
 
+/// An mxboot theme. Initialized from presets, currently only `pmos_dark()`.
+/// Methods on this struct return LVGL `Style` objects which can be added to
+/// widgets.
 pub struct MxTheme {
-    pub window: MxWindow,
-    pub header: MxHeader,
-    pub keyboard: MxKeyboard,
-    pub button: MxButton,
-    pub text_area: MxTextArea,
-    pub dropdown: MxDropdown,
-    pub label: MxLabel,
-    pub msgbox: MxMsgbox,
-    pub bar: MxBar,
+    window: MxWindow,
+    header: MxHeader,
+    keyboard: MxKeyboard,
+    button: MxButton,
+    text_area: MxTextArea,
+    dropdown: MxDropdown,
+    label: MxLabel,
+    msgbox: MxMsgbox,
+    bar: MxBar,
 }
 
-pub struct MxWindow {
-    pub bg_color: Color,
+struct MxWindow {
+    bg_color: Color,
 }
 
-pub struct MxHeader {
-    pub bg_color: Color,
-    pub border_width: i16,
-    pub border_color: Color,
-    pub pad: i16,
-    pub gap: i16,
+struct MxHeader {
+    bg_color: Color,
+    border_width: i16,
+    border_color: Color,
+    pad: i16,
+    gap: i16,
 }
 
-pub struct MxKeyboard {
-    pub bg_color: Color,
-    pub border_width: i16,
-    pub border_color: Color,
-    pub pad: i16,
-    pub gap: i16,
-    pub keys: MxKeys,
+struct MxKeyboard {
+    bg_color: Color,
+    border_width: i16,
+    border_color: Color,
+    pad: i16,
+    gap: i16,
+    keys: MxKeys,
 }
 
-pub struct MxKeys {
-    pub border_width: i16,
-    pub corner_radius: i16,
-    pub key_char: MxKeyType,
-    pub key_non_char: MxKeyType,
-    pub key_mod_act: MxKeyType,
-    pub key_mod_inact: MxKeyType,
+struct MxKeys {
+    border_width: i16,
+    corner_radius: i16,
+    key_char: MxKeyType,
+    key_non_char: MxKeyType,
+    key_mod_act: MxKeyType,
+    key_mod_inact: MxKeyType,
 }
 
-pub struct MxKeyType {
-    pub normal: MxKeyState,
-    pub pressed: MxKeyState,
+struct MxKeyType {
+    normal: MxKeyState,
+    pressed: MxKeyState,
 }
 
-pub struct MxKeyState {
-    pub fg_color: Color,
-    pub bg_color: Color,
-    pub border_color: Color,
+struct MxKeyState {
+    fg_color: Color,
+    bg_color: Color,
+    border_color: Color,
 }
 
-pub struct MxButton {
-    pub border_width: i16,
-    pub corner_radius: i16,
-    pub pad: i16,
-    pub normal: MxKeyState,
-    pub pressed: MxKeyState,
+struct MxButton {
+    border_width: i16,
+    corner_radius: i16,
+    pad: i16,
+    normal: MxKeyState,
+    pressed: MxKeyState,
 }
 
-pub struct MxTextArea {
-    pub fg_color: Color,
-    pub bg_color: Color,
-    pub border_width: i16,
-    pub border_color: Color,
-    pub corner_radius: i16,
-    pub pad: i16,
-    pub placeholder_color: Color,
-    pub cursor: MxCursor,
+struct MxTextArea {
+    fg_color: Color,
+    bg_color: Color,
+    border_width: i16,
+    border_color: Color,
+    corner_radius: i16,
+    pad: i16,
+    placeholder_color: Color,
+    cursor: MxCursor,
 }
 
-pub struct MxCursor {
-    pub width: i16,
-    pub color: Color,
-    pub period: i16,
+struct MxCursor {
+    width: i16,
+    color: Color,
+    period: i16,
 }
 
-pub struct MxDropdown {
-    pub button: MxButton,
-    pub list: MxList,
+struct MxDropdown {
+    button: MxButton,
+    list: MxList,
 }
 
-pub struct MxList {
-    pub fg_color: Color,
-    pub bg_color: Color,
-    pub selection_fg_color: Color,
-    pub selection_bg_color: Color,
-    pub border_width: i16,
-    pub border_color: Color,
-    pub corner_radius: i16,
-    pub pad: i16,
+struct MxList {
+    fg_color: Color,
+    bg_color: Color,
+    selection_fg_color: Color,
+    selection_bg_color: Color,
+    border_width: i16,
+    border_color: Color,
+    corner_radius: i16,
+    pad: i16,
 }
 
-pub struct MxLabel {
-    pub fg_color: Color,
+struct MxLabel {
+    fg_color: Color,
 }
 
-pub struct MxMsgbox {
-    pub fg_color: Color,
-    pub bg_color: Color,
-    pub border_width: i16,
-    pub border_color: Color,
-    pub corner_radius: i16,
-    pub pad: i16,
-    pub gap: i16,
-    pub buttons: MxMsgButtons,
-    pub dimming: MxDimming,
+struct MxMsgbox {
+    fg_color: Color,
+    bg_color: Color,
+    border_width: i16,
+    border_color: Color,
+    corner_radius: i16,
+    pad: i16,
+    gap: i16,
+    //buttons: MxMsgButtons,
+    dimming: MxDimming,
 }
 
-pub struct MxMsgButtons {
-    pub gap: i16,
+//struct MxMsgButtons {
+//    gap: i16,
+//}
+
+struct MxDimming {
+    color: Color,
+    opacity: Opacity,
 }
 
-pub struct MxDimming {
-    pub color: Color,
-    pub opacity: i16,
+struct MxBar {
+    border_width: i16,
+    border_color: Color,
+    corner_radius: i16,
+    indicator: MxIndicator,
 }
 
-pub struct MxBar {
-    pub border_width: i16,
-    pub border_color: Color,
-    pub corner_radius: i16,
-    pub indicator: MxIndicator,
-}
-
-pub struct MxIndicator {
-    pub bg_color: Color,
+struct MxIndicator {
+    bg_color: Color,
 }
 
 impl MxTheme {
     /// Gets the style to be used on windows, given the current theme.
     pub fn style_window(&self) -> Style {
         let mut style = Style::default();
+        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
         style.set_bg_color(State::DEFAULT, self.window.bg_color.clone());
         style
     }
@@ -155,6 +161,7 @@ impl MxTheme {
     /// Gets the style to be used on the header, given the current theme.
     pub fn style_header(&self) -> Style {
         let mut style = Style::default();
+        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
         style.set_bg_color(State::DEFAULT, self.header.bg_color.clone());
         style.set_border_side(State::DEFAULT, BorderSide::Bottom as i16);
         style.set_border_width(State::DEFAULT, self.header.border_width);
@@ -173,6 +180,7 @@ impl MxTheme {
     /// Gets the style to be used on the keyboard, given the current theme.
     pub fn style_keyboard(&self) -> Style {
         let mut style = Style::default();
+        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
         style.set_bg_color(State::DEFAULT, self.keyboard.bg_color.clone());
         style.set_border_side(State::DEFAULT, BorderSide::Top as i16);
         style.set_border_width(State::DEFAULT, self.keyboard.border_width);
@@ -188,9 +196,195 @@ impl MxTheme {
         style
     }
 
+    /// Gets the style to be used on keys, given the current theme.
     pub fn style_key(&self) -> Style {
         let mut style = Style::default();
-        // ...
+        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
+        style.set_border_side(State::DEFAULT, BorderSide::Full as i16);
+        style.set_border_width(State::DEFAULT, self.keyboard.keys.border_width);
+        style.set_radius(State::DEFAULT, self.keyboard.keys.corner_radius);
+        style
+    }
+
+    /// Gets the style to be used on buttons, given the current theme.
+    pub fn style_button(&self) -> Style {
+        let mut style = Style::default();
+        style.set_text_color(State::DEFAULT, self.button.normal.fg_color.clone());
+        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
+        style.set_bg_color(State::DEFAULT, self.button.normal.bg_color.clone());
+        style.set_border_side(State::DEFAULT, BorderSide::Full as i16);
+        style.set_border_width(State::DEFAULT, self.button.border_width);
+        style.set_border_color(State::DEFAULT, self.button.normal.border_color.clone());
+        style.set_radius(State::DEFAULT, self.button.corner_radius);
+        style.set_pad_bottom(State::DEFAULT, self.button.pad);
+        style.set_pad_left(State::DEFAULT, self.button.pad);
+        style.set_pad_top(State::DEFAULT, self.button.pad);
+        style.set_pad_right(State::DEFAULT, self.button.pad);
+        style
+    }
+
+    /// Gets the style to be used on pressed buttons, given the current theme.
+    pub fn style_button_pressed(&self) -> Style {
+        let mut style = Style::default();
+        style.set_text_color(State::DEFAULT, self.button.pressed.fg_color.clone());
+        style.set_bg_color(State::DEFAULT, self.button.pressed.bg_color.clone());
+        style.set_border_color(State::DEFAULT, self.button.pressed.border_color.clone());
+        style
+    }
+
+    /// Gets the style to be used on text areas, given the current theme.
+    pub fn style_text_area(&self) -> Style {
+        let mut style = Style::default();
+        style.set_text_color(State::DEFAULT, self.text_area.fg_color.clone());
+        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
+        style.set_bg_color(State::DEFAULT, self.text_area.bg_color.clone());
+        style.set_border_side(State::DEFAULT, BorderSide::Full as i16);
+        style.set_border_width(State::DEFAULT, self.text_area.border_width);
+        style.set_border_color(State::DEFAULT, self.text_area.border_color.clone());
+        style.set_radius(State::DEFAULT, self.text_area.corner_radius);
+        style.set_pad_bottom(State::DEFAULT, self.text_area.pad);
+        style.set_pad_left(State::DEFAULT, self.text_area.pad);
+        style.set_pad_top(State::DEFAULT, self.text_area.pad);
+        style.set_pad_right(State::DEFAULT, self.text_area.pad);
+        style
+    }
+
+    /// Gets the style to be used on text area placeholders, given the current
+    /// theme.
+    pub fn style_text_area_placeholder(&self) -> Style {
+        let mut style = Style::default();
+        style.set_text_color(State::DEFAULT, self.text_area.placeholder_color.clone());
+        style
+    }
+
+    /// Gets the style to be used on cursor text areas, given the current
+    /// theme.
+    pub fn style_text_area_cursor(&self) -> Style {
+        let mut style = Style::default();
+        style.set_border_side(State::DEFAULT, BorderSide::Left as i16);
+        style.set_border_width(State::DEFAULT, self.text_area.cursor.width);
+        style.set_border_color(State::DEFAULT, self.text_area.cursor.color.clone());
+        style
+    }
+
+    /// Gets the style to be used on dropdown menys, given the current theme.
+    pub fn style_dropdown(&self) -> Style {
+        let mut style = Style::default();
+        style.set_text_color(State::DEFAULT, self.dropdown.button.normal.fg_color.clone());
+        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
+        style.set_bg_color(State::DEFAULT, self.dropdown.button.normal.bg_color.clone());
+        style.set_border_side(State::DEFAULT, BorderSide::Full as i16);
+        style.set_border_width(State::DEFAULT, self.dropdown.button.border_width);
+        style.set_border_color(State::DEFAULT, self.dropdown.button.normal.border_color.clone());
+        style.set_radius(State::DEFAULT, self.dropdown.button.corner_radius);
+        style.set_pad_bottom(State::DEFAULT, self.dropdown.button.pad);
+        style.set_pad_left(State::DEFAULT, self.dropdown.button.pad);
+        style.set_pad_top(State::DEFAULT, self.dropdown.button.pad);
+        style.set_pad_right(State::DEFAULT, self.dropdown.button.pad);
+        style
+    }
+
+    /// Gets the style to be used on pressed dropdown menus, given the current
+    /// theme.
+    pub fn style_dropdown_pressed(&self) -> Style {
+        let mut style = Style::default();
+        style.set_text_color(State::DEFAULT, self.dropdown.button.pressed.fg_color.clone());
+        style.set_bg_color(State::DEFAULT, self.dropdown.button.pressed.bg_color.clone());
+        style.set_border_color(State::DEFAULT, self.dropdown.button.pressed.border_color.clone());
+        style
+    }
+
+    /// Gets the style to be used on dropdown menu lists, given the current
+    /// theme.
+    pub fn style_dropdown_list(&self) -> Style {
+        let mut style = Style::default();
+        style.set_text_color(State::DEFAULT, self.dropdown.list.fg_color.clone());
+        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
+        style.set_bg_color(State::DEFAULT, self.dropdown.list.bg_color.clone());
+        style.set_border_side(State::DEFAULT, BorderSide::Full as i16);
+        style.set_border_width(State::DEFAULT, self.dropdown.list.border_width);
+        style.set_border_color(State::DEFAULT, self.dropdown.list.border_color.clone());
+        style.set_radius(State::DEFAULT, self.dropdown.list.corner_radius);
+        style.set_pad_bottom(State::DEFAULT, self.dropdown.list.pad);
+        style.set_pad_left(State::DEFAULT, self.dropdown.list.pad);
+        style.set_pad_top(State::DEFAULT, self.dropdown.list.pad);
+        style.set_pad_right(State::DEFAULT, self.dropdown.list.pad);
+        style
+    }
+
+    /// Gets the style to be used on selected dropdown menu lists, given the
+    /// current theme.
+    pub fn style_dropdown_list_selected(&self) -> Style {
+        let mut style = Style::default();
+        style.set_text_color(State::DEFAULT, self.dropdown.list.selection_fg_color.clone());
+        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
+        style.set_bg_color(State::DEFAULT, self.dropdown.list.selection_bg_color.clone());
+        style
+    }
+
+    /// Gets the style to be used on labels, given the current theme.
+    pub fn style_label(&self) -> Style {
+        let mut style = Style::default();
+        style.set_text_color(State::DEFAULT, self.label.fg_color.clone());
+        style
+    }
+
+    /// Gets the style to be used on message boxes, given the current theme.
+    pub fn style_msgbox(&self) -> Style {
+        let mut style = Style::default();
+        style.set_text_color(State::DEFAULT, self.msgbox.fg_color.clone());
+        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
+        style.set_bg_color(State::DEFAULT, self.msgbox.bg_color.clone());
+        style.set_border_side(State::DEFAULT, BorderSide::Full as i16);
+        style.set_border_width(State::DEFAULT, self.msgbox.border_width);
+        style.set_border_color(State::DEFAULT, self.msgbox.border_color.clone());
+        style.set_radius(State::DEFAULT, self.msgbox.corner_radius);
+        style.set_pad_bottom(State::DEFAULT, self.msgbox.pad);
+        style.set_pad_left(State::DEFAULT, self.msgbox.pad);
+        style.set_pad_top(State::DEFAULT, self.msgbox.pad);
+        style.set_pad_right(State::DEFAULT, self.msgbox.pad);
+        style
+    }
+
+    /// Gets the style to be used on message box labels, given the current
+    /// theme.
+    pub fn style_msgbox_label(&self) -> Style {
+        let mut style = Style::default();
+        style.set_pad_bottom(State::DEFAULT, self.msgbox.pad);
+        style
+    }
+
+    // / Gets the style to be used on message box button matrices, given the
+    // / current theme.
+    //pub fn style_msgbox_btnmatrix(&self) -> Style {
+    //    let mut style = Style::default();
+    //    style
+    //}
+
+    /// Gets the style to be used on message box backgrounds, given the
+    /// current theme.
+    pub fn style_msgbox_background(&self) -> Style {
+        let mut style = Style::default();
+        style.set_bg_color(State::DEFAULT, self.msgbox.dimming.color.clone());
+        style.set_bg_opa(State::DEFAULT, self.msgbox.dimming.opacity);
+        style
+    }
+
+    /// Gets the style to be used on bars, given the current theme.
+    pub fn style_bar(&self) -> Style {
+        let mut style = Style::default();
+        style.set_border_side(State::DEFAULT, BorderSide::Full as i16);
+        style.set_border_width(State::DEFAULT, self.bar.border_width);
+        style.set_border_color(State::DEFAULT, self.bar.border_color.clone());
+        style.set_radius(State::DEFAULT, self.bar.corner_radius);
+        style
+    }
+
+    /// Gets the style to be used on bar indicators, given the current theme.
+    pub fn style_bar_indicator(&self) -> Style {
+        let mut style = Style::default();
+        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
+        style.set_bg_color(State::DEFAULT, self.bar.indicator.bg_color.clone());
         style
     }
 
@@ -332,12 +526,12 @@ impl MxTheme {
                 corner_radius: 3,
                 pad: 20,
                 gap: 20,
-                buttons: MxMsgButtons {
-                    gap: 10
-                },
+                //buttons: MxMsgButtons {
+                //    gap: 10
+                //},
                 dimming: MxDimming {
                     color: Color::from_rgb((0x07, 0x0c, 0x0d)),
-                    opacity: 225
+                    opacity: Opacity::OPA_90
                 }
             },
             bar: MxBar {
