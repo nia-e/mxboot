@@ -10,6 +10,17 @@ use cstr_core::CString;
 use embedded_graphics::prelude::*;
 use lvgl::{widgets, Align, Color, Event, LvError, Part, Widget, UI};
 use std::{thread::sleep, time::Duration};
+use std::sync::mpsc::channel;
+
+#[derive(Debug, Clone, Copy)]
+enum NavRoute {
+    Home,
+    Terminal,
+}
+
+enum GuiEvent {
+    Navigate(NavRoute),
+}
 
 /// Loads the actual GUI on the display.
 ///
@@ -41,6 +52,8 @@ where
     label.set_text(CString::new("Terminal").unwrap().as_c_str())?;
     label.add_style(Part::Main, theme.style_label())?;
 
+    let (tx, rx) = channel::<GuiEvent>();
+
     /*
     let mut kb = widgets::Keyboard::new(&mut screen)?;
     kb.set_align(&mut screen, Align::InBottomMid, 0, 0)?;
@@ -49,11 +62,13 @@ where
     kb.set_cursor_manage(true)?;
     */
 
-    button.on_event(|mut btn, event| {
+    button.on_event(move |mut btn, event| {
         if let lvgl::Event::Clicked = event {
-            term_ui::term_ui(&mut ui, &theme, &mut window).unwrap();
-            ui.load_scr(&mut screen).unwrap();
-            btn.toggle().unwrap();
+            println!("Clicked!");
+            tx.send(GuiEvent::Navigate(NavRoute::Terminal)).unwrap();
+            // term_ui::term_ui(&mut ui, &theme, &mut window).unwrap();
+            // ui.load_scr(&mut screen).unwrap();
+            // btn.toggle().unwrap();
         }
     })?;
 
@@ -67,6 +82,7 @@ where
             let w: &mut Window = transmute(window.as_mut().unwrap());
             w.update::<Rgb565>(transmute(ui.get_display_ref().unwrap()));
             for event in w.events() {
+                println!("{:?}", event);
                 match event {
                     SimulatorEvent::MouseButtonUp {
                         mouse_btn: _,
@@ -80,8 +96,24 @@ where
                     _ => {}
                 }
             }
+            while let Ok(event) = rx.try_recv() {
+                match event {
+                    GuiEvent::Navigate(route) => {
+                        println!("Navigating to {:?}", route);
+                        match route {
+                            NavRoute::Terminal => {
+                                let mut term_screen = term_ui::term_ui(&theme)?;
+                                ui.load_scr(&mut term_screen).unwrap();
+                            }
+                            Home => {
+                                ui.load_scr(&mut screen).unwrap();
+                            }
+                        }
+                    }
+                }
+            }
         }
-        sleep(Duration::from_millis(16));
+        ui.tick_inc(Duration::from_millis(16));
     }
     Ok(())
 }
