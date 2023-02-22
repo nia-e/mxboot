@@ -9,13 +9,13 @@ use super::{contains::contains, term_ui, theme::MxTheme};
 use cstr_core::CString;
 use embedded_graphics::prelude::*;
 use lvgl::{widgets, Align, Color, Event, LvError, Part, Widget, UI};
-use std::{thread::sleep, time::Duration};
-use std::sync::mpsc::channel;
+use std::{sync::mpsc::channel, time::Duration};
 
 #[derive(Debug, Clone, Copy)]
 enum NavRoute {
     Home,
     Terminal,
+    Exit,
 }
 
 enum GuiEvent {
@@ -31,7 +31,7 @@ enum GuiEvent {
 /// typesystem as that would require pulling in `embedded_graphics_simulator`
 /// on `aarch64` builds, increasing executable size.
 pub unsafe fn load_gui<D: DrawTarget + OriginDimensions, T>(
-    mut display: D,
+    display: D,
     mut window: Option<T>,
 ) -> Result<(), LvError>
 where
@@ -62,13 +62,10 @@ where
     kb.set_cursor_manage(true)?;
     */
 
-    button.on_event(move |mut btn, event| {
+    button.on_event(move |_, event| {
         if let lvgl::Event::Clicked = event {
             println!("Clicked!");
             tx.send(GuiEvent::Navigate(NavRoute::Terminal)).unwrap();
-            // term_ui::term_ui(&mut ui, &theme, &mut window).unwrap();
-            // ui.load_scr(&mut screen).unwrap();
-            // btn.toggle().unwrap();
         }
     })?;
 
@@ -96,19 +93,18 @@ where
                     _ => {}
                 }
             }
-            while let Ok(event) = rx.try_recv() {
-                match event {
-                    GuiEvent::Navigate(route) => {
-                        println!("Navigating to {:?}", route);
-                        match route {
-                            NavRoute::Terminal => {
-                                let mut term_screen = term_ui::term_ui(&theme)?;
-                                ui.load_scr(&mut term_screen).unwrap();
-                            }
-                            Home => {
-                                ui.load_scr(&mut screen).unwrap();
-                            }
+        }
+        while let Ok(event) = rx.try_recv() {
+            match event {
+                GuiEvent::Navigate(route) => {
+                    println!("Navigating to {:?}", route);
+                    match route {
+                        NavRoute::Terminal => {
+                            let mut term_screen = term_ui::term_ui(&theme)?;
+                            ui.load_scr(&mut term_screen)?;
                         }
+                        NavRoute::Home => ui.load_scr(&mut screen)?,
+                        NavRoute::Exit => break 'running,
                     }
                 }
             }
