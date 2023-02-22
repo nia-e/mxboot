@@ -5,63 +5,60 @@ use embedded_graphics_simulator::{SimulatorEvent, Window};
 #[cfg(not(target_arch = "aarch64"))]
 use std::mem::transmute;
 
-use super::{contains::contains, term_ui, theme::MxTheme};
+use super::theme::MxTheme;
 use cstr_core::CString;
 use embedded_graphics::prelude::*;
-use lvgl::{widgets, Align, Color, Event, LvError, Part, Widget, UI};
-use std::{thread::sleep, time::Duration};
+use lvgl::{widgets, Align, Color, Event, LvError, NativeObject, Obj, Part, Widget, UI};
+use lvgl_sys::{_lv_obj_t, lv_obj_create};
+use std::{ptr, thread::sleep, time::Duration};
 
-/// Loads the actual GUI on the display.
+/// Loads the terminal emulator UI on the display.
 ///
 /// # Safety
 ///
 /// If the target is `aarch64`, `window` must be an object of type
 /// `embedded_graphics_simulator::Window`. This is not enforced by the
 /// typesystem as that would require pulling in `embedded_graphics_simulator`
-/// on `aarch64` builds, increasing executable size.
-pub unsafe fn load_gui<D: DrawTarget + OriginDimensions, T>(
-    mut display: D,
-    mut window: Option<T>,
+pub unsafe fn term_ui<D: DrawTarget + OriginDimensions, T>(
+    ui: &mut UI<D, <D as DrawTarget>::Color>,
+    theme: &MxTheme,
+    window: &mut Option<T>,
 ) -> Result<(), LvError>
 where
     <D as DrawTarget>::Color: From<Color>,
 {
-    let mut ui = UI::init()?;
-    ui.disp_drv_register(display)?;
-    let theme = MxTheme::pmos_dark();
-    let mut screen = ui.scr_act()?;
+    println!("In");
+    // Need to create a new screen for the terminal UI
+    let mut screen =
+        Obj::from_raw(ptr::NonNull::new(lv_obj_create(ptr::null_mut(), ptr::null_mut())).unwrap());
     screen.add_style(Part::Main, theme.style_window())?;
 
-    let mut button = widgets::Btn::new(&mut screen)?;
-    button.set_align(&mut screen, Align::InTopMid, 0, 0)?;
-    button.set_size(200, 100)?;
-    button.add_style(Part::Main, theme.style_button())?;
-
-    let mut label = widgets::Label::new(&mut button)?;
-    label.set_text(CString::new("Terminal").unwrap().as_c_str())?;
-    label.add_style(Part::Main, theme.style_label())?;
-
-    /*
     let mut kb = widgets::Keyboard::new(&mut screen)?;
     kb.set_align(&mut screen, Align::InBottomMid, 0, 0)?;
     kb.set_size(1080, 540).unwrap();
     kb.add_style(Part::Main, theme.style_keyboard()).unwrap();
     kb.set_cursor_manage(true)?;
-    */
 
-    button.on_event(|mut btn, event| {
-        if let lvgl::Event::Clicked = event {
-            term_ui::term_ui(&mut ui, &theme, &mut window).unwrap();
-            ui.load_scr(&mut screen).unwrap();
-            btn.toggle().unwrap();
-        }
-    })?;
+    let mut ta = widgets::Textarea::new(&mut screen)?;
+    ta.set_align(&mut screen, Align::InTopMid, 0, 0)?;
+    ta.set_size(1080, 1620)?;
+    ta.set_text(CString::new("").unwrap().as_c_str())?;
+    ta.add_style(Part::Main, theme.style_text_area())?;
+
+    ui.load_scr(&mut screen)?;
+
+    // lv_keyboard_set_textarea not implemented yet in the LVGL crate
+    unsafe {
+        lvgl_sys::lv_keyboard_set_textarea(
+            kb.raw()?.as_mut() as *mut _lv_obj_t,
+            ta.raw()?.as_mut() as *mut _lv_obj_t,
+        )
+    }
 
     'running: loop {
         ui.task_handler();
-        // Not proud of all the transmutes, but it's the only way to make this
-        // generic over simulated vs real displays without extensive code
-        // duplication which would probably be worse.
+
+        // See gui.rs:59
         #[cfg(not(target_arch = "aarch64"))]
         unsafe {
             let w: &mut Window = transmute(window.as_mut().unwrap());
@@ -70,12 +67,13 @@ where
                 match event {
                     SimulatorEvent::MouseButtonUp {
                         mouse_btn: _,
-                        point,
+                        point: _,
                     } => {
-                        if contains(&button, &point)? {
-                            ui.event_send(&mut button, Event::Clicked)?
-                        }
+                        //if contains(&button, &point)? {
+                        //    ui.event_send(&mut button, Event::Clicked)?
+                        //}
                     }
+                    // Ideally should quit window entirely but idc honestly
                     SimulatorEvent::Quit => break 'running,
                     _ => {}
                 }

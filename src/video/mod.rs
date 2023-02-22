@@ -9,4 +9,5 @@ pub mod mock_init;
 pub mod contains;
 
 pub mod gui;
+pub mod term_ui;
 pub mod theme;

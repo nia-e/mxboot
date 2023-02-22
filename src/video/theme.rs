@@ -3,7 +3,10 @@
 
 #![allow(dead_code)]
 
-use lvgl::{style::{Style, Opacity}, Color, State};
+use lvgl::{
+    style::{Opacity, Style},
+    Color, State,
+};
 
 #[repr(i16)]
 enum BorderSide {
@@ -13,7 +16,7 @@ enum BorderSide {
     Left = 0x04,
     Right = 0x08,
     Full = 0x0f,
-    Internal = 0x10
+    Internal = 0x10,
 }
 
 /// An mxboot theme. Initialized from presets, currently only `pmos_dark()`.
@@ -275,7 +278,10 @@ impl MxTheme {
         style.set_bg_color(State::DEFAULT, self.dropdown.button.normal.bg_color.clone());
         style.set_border_side(State::DEFAULT, BorderSide::Full as i16);
         style.set_border_width(State::DEFAULT, self.dropdown.button.border_width);
-        style.set_border_color(State::DEFAULT, self.dropdown.button.normal.border_color.clone());
+        style.set_border_color(
+            State::DEFAULT,
+            self.dropdown.button.normal.border_color.clone(),
+        );
         style.set_radius(State::DEFAULT, self.dropdown.button.corner_radius);
         style.set_pad_bottom(State::DEFAULT, self.dropdown.button.pad);
         style.set_pad_left(State::DEFAULT, self.dropdown.button.pad);
@@ -288,9 +294,18 @@ impl MxTheme {
     /// theme.
     pub fn style_dropdown_pressed(&self) -> Style {
         let mut style = Style::default();
-        style.set_text_color(State::DEFAULT, self.dropdown.button.pressed.fg_color.clone());
-        style.set_bg_color(State::DEFAULT, self.dropdown.button.pressed.bg_color.clone());
-        style.set_border_color(State::DEFAULT, self.dropdown.button.pressed.border_color.clone());
+        style.set_text_color(
+            State::DEFAULT,
+            self.dropdown.button.pressed.fg_color.clone(),
+        );
+        style.set_bg_color(
+            State::DEFAULT,
+            self.dropdown.button.pressed.bg_color.clone(),
+        );
+        style.set_border_color(
+            State::DEFAULT,
+            self.dropdown.button.pressed.border_color.clone(),
+        );
         style
     }
 
@@ -316,9 +331,15 @@ impl MxTheme {
     /// current theme.
     pub fn style_dropdown_list_selected(&self) -> Style {
         let mut style = Style::default();
-        style.set_text_color(State::DEFAULT, self.dropdown.list.selection_fg_color.clone());
+        style.set_text_color(
+            State::DEFAULT,
+            self.dropdown.list.selection_fg_color.clone(),
+        );
         style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
-        style.set_bg_color(State::DEFAULT, self.dropdown.list.selection_bg_color.clone());
+        style.set_bg_color(
+            State::DEFAULT,
+            self.dropdown.list.selection_bg_color.clone(),
+        );
         style
     }
 
@@ -392,7 +413,9 @@ impl MxTheme {
     /// https://coolors.co/009900-395e66-db504a-e3b505-ebf5ee
     pub fn pmos_dark() -> Self {
         Self {
-            window: MxWindow { bg_color: Color::from_rgb((0x07, 0x0c, 0x0d)) },
+            window: MxWindow {
+                bg_color: Color::from_rgb((0x07, 0x0c, 0x0d)),
+            },
             header: MxHeader {
                 bg_color: Color::from_rgb((0x07, 0x0c, 0x0d)),
                 border_width: 0,
@@ -466,13 +489,13 @@ impl MxTheme {
                 normal: MxKeyState {
                     fg_color: Color::from_rgb((0xf2, 0xf7, 0xf8)),
                     bg_color: Color::from_rgb((0x25, 0x3c, 0x41)),
-                    border_color: Color::from_rgb((0x2c, 0x48, 0x4e))
+                    border_color: Color::from_rgb((0x2c, 0x48, 0x4e)),
                 },
                 pressed: MxKeyState {
                     fg_color: Color::from_rgb((0xf2, 0xf7, 0xf8)),
                     bg_color: Color::from_rgb((0x00, 0x99, 0x00)),
-                    border_color: Color::from_rgb((0x00, 0x99, 0x00))
-                }
+                    border_color: Color::from_rgb((0x00, 0x99, 0x00)),
+                },
             },
             text_area: MxTextArea {
                 fg_color: Color::from_rgb((0xf2, 0xf7, 0xf8)),
@@ -485,8 +508,8 @@ impl MxTheme {
                 cursor: MxCursor {
                     width: 2,
                     color: Color::from_rgb((0x00, 0x99, 0x00)),
-                    period: 700
-                }
+                    period: 700,
+                },
             },
             dropdown: MxDropdown {
                 button: MxButton {
@@ -496,13 +519,13 @@ impl MxTheme {
                     normal: MxKeyState {
                         fg_color: Color::from_rgb((0xf2, 0xf7, 0xf8)),
                         bg_color: Color::from_rgb((0x25, 0x3c, 0x41)),
-                        border_color: Color::from_rgb((0x2c, 0x48, 0x4e))
+                        border_color: Color::from_rgb((0x2c, 0x48, 0x4e)),
                     },
                     pressed: MxKeyState {
                         fg_color: Color::from_rgb((0xf2, 0xf7, 0xf8)),
                         bg_color: Color::from_rgb((0x00, 0x99, 0x00)),
-                        border_color: Color::from_rgb((0x00, 0x99, 0x00))
-                    }
+                        border_color: Color::from_rgb((0x00, 0x99, 0x00)),
+                    },
                 },
                 list: MxList {
                     fg_color: Color::from_rgb((0xf2, 0xf7, 0xf8)),
@@ -512,11 +535,11 @@ impl MxTheme {
                     border_width: 1,
                     border_color: Color::from_rgb((0x39, 0x5e, 0x66)),
                     corner_radius: 0,
-                    pad: 8
-                }
+                    pad: 8,
+                },
             },
             label: MxLabel {
-                fg_color: Color::from_rgb((0xf2, 0xf7, 0xf8))
+                fg_color: Color::from_rgb((0xf2, 0xf7, 0xf8)),
             },
             msgbox: MxMsgbox {
                 fg_color: Color::from_rgb((0xf2, 0xf7, 0xf8)),
@@ -531,17 +554,17 @@ impl MxTheme {
                 //},
                 dimming: MxDimming {
                     color: Color::from_rgb((0x07, 0x0c, 0x0d)),
-                    opacity: Opacity::OPA_90
-                }
+                    opacity: Opacity::OPA_90,
+                },
             },
             bar: MxBar {
                 border_width: 1,
                 border_color: Color::from_rgb((0x00, 0x99, 0x00)),
                 corner_radius: 3,
                 indicator: MxIndicator {
-                    bg_color: Color::from_rgb((0x00, 0x99, 0x00))
-                }
-            }
+                    bg_color: Color::from_rgb((0x00, 0x99, 0x00)),
+                },
+            },
         }
     }
 }
