@@ -10,7 +10,7 @@ use cstr_core::CString;
 use embedded_graphics::prelude::*;
 use lvgl::{widgets, Align, Color, Event, LvError, Part, Widget, UI};
 use std::{thread::sleep, time::Duration};
-use super::theme::MxTheme;
+use super::{theme::MxTheme, contains::contains};
 
 /// Loads the actual GUI on the display.
 ///
@@ -61,8 +61,10 @@ where
             w.update::<Rgb565>(transmute(ui.get_display_ref().unwrap()));
             for event in w.events() {
                 match event {
-                    SimulatorEvent::MouseButtonUp { .. } => {
-                        ui.event_send(&mut button, Event::Clicked)?
+                    SimulatorEvent::MouseButtonUp { mouse_btn: _, point } => {
+                        if contains(&button, &point)? {
+                            ui.event_send(&mut button, Event::Clicked)?
+                        }
                     }
                     SimulatorEvent::Quit => break 'running,
                     _ => {}
