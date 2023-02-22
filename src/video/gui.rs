@@ -16,10 +16,10 @@ use super::theme::MxTheme;
 ///
 /// # Safety
 ///
-/// If the target is aarch64, window must be an object of type
+/// If the target is `aarch64`, `window` must be an object of type
 /// `embedded_graphics_simulator::Window`. This is not enforced by the
 /// typesystem as that would require pulling in `embedded_graphics_simulator`
-/// on aarch64 builds, increasing executable size.
+/// on `aarch64` builds, increasing executable size.
 pub unsafe fn load_gui<D: DrawTarget + OriginDimensions, T>(
     display: D,
     mut window: Option<T>,
@@ -41,6 +41,7 @@ where
     button.add_style(Part::Main, theme.style_button())?;
     let mut label = widgets::Label::new(&mut button)?;
     label.set_text(CString::new("Click me!").unwrap().as_c_str())?;
+    label.add_style(Part::Main, theme.style_label())?;
 
     button.on_event(|mut btn, event| {
         if let lvgl::Event::Clicked = event {
