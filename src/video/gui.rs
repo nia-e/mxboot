@@ -8,7 +8,7 @@ use std::mem::transmute;
 use super::{contains::get_obj_at_pt, term_ui, theme::MxTheme};
 use cstr_core::CString;
 use embedded_graphics::prelude::*;
-use lvgl::{widgets, Align, Color, Event, LvError, Part, Widget, UI};
+use lvgl::{widgets, Align, Color, Event, LvError, Part, Widget, UI, NativeObject};
 use std::{sync::mpsc::channel, time::Duration};
 
 /// Possible screens to which the UI can navigate. `Exit` represents quitting
@@ -77,6 +77,10 @@ where
         }
     })?;
 
+    label.on_event(|_, event| {
+        ui.event_send(&mut button, event).unwrap()
+    })?;
+
     'running: loop {
         ui.task_handler();
         // Not proud of all the transmutes, but it's the only way to make this
@@ -87,14 +91,17 @@ where
             let w: &mut Window = transmute(window.as_mut().unwrap());
             w.update::<Rgb565>(transmute(ui.get_display_ref().unwrap()));
             for event in w.events() {
-                println!("{:?}", event);
+                //println!("{:?}", event);
                 match event {
                     SimulatorEvent::MouseButtonUp {
                         mouse_btn: _,
                         point,
                     } => {
                         if let Some(obj) = get_obj_at_pt(&screen, &point) {
-                            println!("Did")
+                            println!("{:?}", button.raw().unwrap().as_mut());
+                            println!("{:?}", obj);
+                            let mut b = widgets::Btn::from_raw(obj.into());
+                            ui.event_send(&mut b, Event::Clicked);
                         }
                     }
                     SimulatorEvent::Quit => match tx.send(GuiEvent::Navigate(NavLocation::Exit)) {

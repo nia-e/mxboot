@@ -7,8 +7,8 @@ use std::ptr;
 
 /// Checks if a given `Point` is inside of the object. Used internally by
 /// `get_obj_at_pt()`.
-fn contains(object: &_lv_obj_t, point: &Point) -> Result<bool, LvError> {
-    let coords = object.coords;
+unsafe fn contains(object: *const _lv_obj_t, point: &Point) -> Result<bool, LvError> {
+    let coords = (*object).coords;
     let (x1, y1, x2, y2) = (
         coords.x1 as i32,
         coords.y1 as i32,
@@ -24,10 +24,10 @@ fn contains(object: &_lv_obj_t, point: &Point) -> Result<bool, LvError> {
 
 /// Recursively searches down the widget tree for the lowest object below the
 /// `Point`. Used internally by `get_obj_at_pt()`.
-fn rec_get_frontmost<'a>(
-    parent: &'a mut _lv_obj_t,
+unsafe fn rec_get_frontmost(
+    parent: *mut _lv_obj_t,
     point: &Point,
-) -> Result<&'a mut _lv_obj_t, LvError> {
+) -> Result<*mut _lv_obj_t, LvError> {
     let mut current = ptr::null_mut();
     unsafe {
         'search: loop {
@@ -35,9 +35,8 @@ fn rec_get_frontmost<'a>(
                 0 => break 'search,
                 p => {
                     current = p as *mut _lv_obj_t;
-                    let ptr: &'a mut _lv_obj_t = &mut *(current as *mut _lv_obj_t);
-                    if contains(ptr, point)? {
-                        return rec_get_frontmost(ptr, point);
+                    if contains(current, point)? {
+                        return rec_get_frontmost(current, point);
                     }
                 }
             }
@@ -54,7 +53,13 @@ pub fn get_obj_at_pt<'a>(screen: &'a Obj, point: &Point) -> Option<&'a mut _lv_o
         let mut current: &'a mut _lv_obj_t = lv_obj_get_child(scr_raw, ptr::null_mut()).as_mut()?;
         'search: loop {
             if contains(current, point).ok()? {
-                return rec_get_frontmost(current, point).ok();
+                return match rec_get_frontmost(current, point) {
+                    Ok(ptr) => Some(&mut *ptr),
+                    Err(e) => {
+                        eprintln!("{:?}", e);
+                        None
+                    }
+                }
             } else {
                 match lv_obj_get_child(scr_raw, current) as usize {
                     // lv_obj_get_child will return a null ptr if exhaustedd
