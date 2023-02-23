@@ -1,8 +1,8 @@
-use super::theme::MxTheme;
+use super::{theme::MxTheme, gui::{GuiEvent, NavLocation}};
 use cstr_core::CString;
 use lvgl::{widgets, Align, LvError, NativeObject, Obj, Part, Widget};
 use lvgl_sys::{_lv_obj_t, lv_obj_create};
-use std::ptr;
+use std::{ptr, sync::mpsc::Sender};
 
 /// Loads the terminal emulator UI on the display.
 ///
@@ -11,7 +11,7 @@ use std::ptr;
 /// If the target is `aarch64`, `window` must be an object of type
 /// `embedded_graphics_simulator::Window`. This is not enforced by the
 /// typesystem as that would require pulling in `embedded_graphics_simulator`
-pub unsafe fn term_ui(theme: &MxTheme) -> Result<Obj, LvError> {
+pub unsafe fn term_ui(theme: &MxTheme, tx: &Sender<GuiEvent>) -> Result<Obj, LvError> {
     println!("In");
     // Need to create a new screen for the terminal UI
     let mut screen =

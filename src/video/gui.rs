@@ -5,21 +5,25 @@ use embedded_graphics_simulator::{SimulatorEvent, Window};
 #[cfg(not(target_arch = "aarch64"))]
 use std::mem::transmute;
 
-use super::{contains::contains, term_ui, theme::MxTheme};
+use super::{contains::get_obj_at_pt, term_ui, theme::MxTheme};
 use cstr_core::CString;
 use embedded_graphics::prelude::*;
 use lvgl::{widgets, Align, Color, Event, LvError, Part, Widget, UI};
 use std::{sync::mpsc::channel, time::Duration};
 
-#[derive(Debug, Clone, Copy)]
-enum NavRoute {
+/// Possible screens to which the UI can navigate. `Exit` represents quitting
+/// mxboot.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum NavLocation {
     Home,
     Terminal,
     Exit,
 }
 
-enum GuiEvent {
-    Navigate(NavRoute),
+/// A GUI event to be processed in the main event loop.
+#[derive(Debug, Clone, Copy)]
+pub enum GuiEvent {
+    Navigate(NavLocation)
 }
 
 /// Loads the actual GUI on the display.
@@ -53,6 +57,7 @@ where
     label.add_style(Part::Main, theme.style_label())?;
 
     let (tx, rx) = channel::<GuiEvent>();
+    let mut current_scr = NavLocation::Home;
 
     /*
     let mut kb = widgets::Keyboard::new(&mut screen)?;
@@ -62,10 +67,13 @@ where
     kb.set_cursor_manage(true)?;
     */
 
-    button.on_event(move |_, event| {
+    button.on_event(|_, event| {
         if let lvgl::Event::Clicked = event {
             println!("Clicked!");
-            tx.send(GuiEvent::Navigate(NavRoute::Terminal)).unwrap();
+            match tx.send(GuiEvent::Navigate(NavLocation::Terminal)) {
+                Ok(_) => (),
+                Err(e) => eprintln!("{e}")
+            }
         }
     })?;
 
@@ -85,11 +93,17 @@ where
                         mouse_btn: _,
                         point,
                     } => {
-                        if contains(&button, &point)? {
-                            ui.event_send(&mut button, Event::Clicked)?
+                        if let Some(obj) = get_obj_at_pt(&screen, &point) {
+                            println!("Did")
                         }
                     }
-                    SimulatorEvent::Quit => break 'running,
+                    SimulatorEvent::Quit => match tx.send(GuiEvent::Navigate(NavLocation::Exit)) {
+                        Ok(_) => (),
+                        Err(e) => {
+                            eprintln!("{e}");
+                            break 'running
+                        }
+                    }
                     _ => {}
                 }
             }
@@ -99,12 +113,16 @@ where
                 GuiEvent::Navigate(route) => {
                     println!("Navigating to {:?}", route);
                     match route {
-                        NavRoute::Terminal => {
-                            let mut term_screen = term_ui::term_ui(&theme)?;
+                        NavLocation::Terminal => {
+                            let mut term_screen = term_ui::term_ui(&theme, &tx)?;
                             ui.load_scr(&mut term_screen)?;
+                            current_scr = NavLocation::Terminal
                         }
-                        NavRoute::Home => ui.load_scr(&mut screen)?,
-                        NavRoute::Exit => break 'running,
+                        NavLocation::Home => {
+                            ui.load_scr(&mut screen)?;
+                            current_scr = NavLocation::Home
+                        },
+                        NavLocation::Exit => break 'running,
                     }
                 }
             }
