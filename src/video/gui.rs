@@ -8,7 +8,7 @@ use std::mem::transmute;
 use super::{contains::get_obj_at_pt, term_ui, theme::MxTheme};
 use cstr_core::CString;
 use embedded_graphics::prelude::*;
-use lvgl::{widgets, Align, Color, Event, LvError, Part, Widget, UI, NativeObject};
+use lvgl::{widgets, Align, Color, Event, LvError, Part, Widget, UI};
 use std::{sync::mpsc::channel, time::Duration};
 
 /// Possible screens to which the UI can navigate. `Exit` represents quitting
@@ -57,15 +57,6 @@ where
     label.add_style(Part::Main, theme.style_label())?;
 
     let (tx, rx) = channel::<GuiEvent>();
-    let mut current_scr = NavLocation::Home;
-
-    /*
-    let mut kb = widgets::Keyboard::new(&mut screen)?;
-    kb.set_align(&mut screen, Align::InBottomMid, 0, 0)?;
-    kb.set_size(1080, 540).unwrap();
-    kb.add_style(Part::Main, theme.style_keyboard()).unwrap();
-    kb.set_cursor_manage(true)?;
-    */
 
     button.on_event(|_, event| {
         if let lvgl::Event::Clicked = event {
@@ -77,9 +68,7 @@ where
         }
     })?;
 
-    label.on_event(|_, event| {
-        ui.event_send(&mut button, event).unwrap()
-    })?;
+    label.on_event(|_, event| ui.event_send(&mut button, event).unwrap())?;
 
     'running: loop {
         ui.task_handler();
@@ -91,17 +80,15 @@ where
             let w: &mut Window = transmute(window.as_mut().unwrap());
             w.update::<Rgb565>(transmute(ui.get_display_ref().unwrap()));
             for event in w.events() {
-                //println!("{:?}", event);
                 match event {
                     SimulatorEvent::MouseButtonUp {
                         mouse_btn: _,
                         point,
                     } => {
-                        if let Some(obj) = get_obj_at_pt(&screen, &point) {
-                            println!("{:?}", button.raw().unwrap().as_mut());
-                            println!("{:?}", obj);
-                            let mut b = widgets::Btn::from_raw(obj.into());
-                            ui.event_send(&mut b, Event::Clicked);
+                        if let Some(obj) = get_obj_at_pt(&ui.scr_act()?, &point) {
+                            // Unsure if this is ok. TODO: figure out if there's a better way to do this
+                            let mut w: widgets::Cont = Widget::from_raw(obj.into());
+                            ui.event_send(&mut w, Event::Clicked)?;
                         }
                     }
                     SimulatorEvent::Quit => match tx.send(GuiEvent::Navigate(NavLocation::Exit)) {
@@ -123,12 +110,9 @@ where
                         NavLocation::Terminal => {
                             let mut term_screen = term_ui::term_ui(&theme, &tx)?;
                             ui.load_scr(&mut term_screen)?;
-                            current_scr = NavLocation::Terminal
                         }
-                        NavLocation::Home => {
-                            ui.load_scr(&mut screen)?;
-                            current_scr = NavLocation::Home
-                        }
+                        NavLocation::Home => ui.load_scr(&mut screen)?,
+
                         NavLocation::Exit => break 'running,
                     }
                 }

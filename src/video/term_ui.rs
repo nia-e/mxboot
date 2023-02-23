@@ -15,7 +15,6 @@ use std::{ptr, sync::mpsc::Sender};
 /// `embedded_graphics_simulator::Window`. This is not enforced by the
 /// typesystem as that would require pulling in `embedded_graphics_simulator`
 pub unsafe fn term_ui(theme: &MxTheme, tx: &Sender<GuiEvent>) -> Result<Obj, LvError> {
-    println!("In");
     // Need to create a new screen for the terminal UI
     let mut screen =
         Obj::from_raw(ptr::NonNull::new(lv_obj_create(ptr::null_mut(), ptr::null_mut())).unwrap());
