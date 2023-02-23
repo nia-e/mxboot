@@ -70,7 +70,7 @@ pub fn get_obj_at_pt<'a>(screen: &'a Obj, point: &Point) -> Option<&'a mut _lv_o
                 };
             } else {
                 match lv_obj_get_child(scr_raw, current) as usize {
-                    // lv_obj_get_child will return a null ptr if exhaustedd
+                    // lv_obj_get_child will return a null ptr if exhausted
                     0 => break 'search,
                     child => current = &mut *(child as *mut _lv_obj_t),
                 }
