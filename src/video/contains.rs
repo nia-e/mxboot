@@ -7,6 +7,10 @@ use std::ptr;
 
 /// Checks if a given `Point` is inside of the object. Used internally by
 /// `get_obj_at_pt()`.
+/// 
+/// # Safety
+/// 
+/// `object` must point to an initialized instance of `_lv_obj_t`.
 unsafe fn contains(object: *const _lv_obj_t, point: &Point) -> Result<bool, LvError> {
     let coords = (*object).coords;
     let (x1, y1, x2, y2) = (
@@ -24,6 +28,10 @@ unsafe fn contains(object: *const _lv_obj_t, point: &Point) -> Result<bool, LvEr
 
 /// Recursively searches down the widget tree for the lowest object below the
 /// `Point`. Used internally by `get_obj_at_pt()`.
+/// 
+/// # Safety
+/// 
+/// `parent` must point to an initialized instance of `_lv_obj_t`.
 unsafe fn rec_get_frontmost(
     parent: *mut _lv_obj_t,
     point: &Point,
