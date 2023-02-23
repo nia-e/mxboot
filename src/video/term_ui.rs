@@ -1,4 +1,7 @@
-use super::{theme::MxTheme, gui::{GuiEvent, NavLocation}};
+use super::{
+    gui::{GuiEvent, NavLocation},
+    theme::MxTheme,
+};
 use cstr_core::CString;
 use lvgl::{widgets, Align, LvError, NativeObject, Obj, Part, Widget};
 use lvgl_sys::{_lv_obj_t, lv_obj_create};

@@ -1,7 +1,7 @@
 //#![cfg(not(target_arch = "aarch64"))]
 
 use embedded_graphics::prelude::Point;
-use lvgl::{LvError, Obj, NativeObject};
+use lvgl::{LvError, NativeObject, Obj};
 use lvgl_sys::{_lv_obj_t, lv_obj_get_child};
 use std::ptr;
 
@@ -24,7 +24,10 @@ fn contains(object: &_lv_obj_t, point: &Point) -> Result<bool, LvError> {
 
 /// Recursively searches down the widget tree for the lowest object below the
 /// `Point`. Used internally by `get_obj_at_pt()`.
-fn rec_get_frontmost<'a>(parent: &'a mut _lv_obj_t, point: &Point) -> Result<&'a mut _lv_obj_t, LvError> {
+fn rec_get_frontmost<'a>(
+    parent: &'a mut _lv_obj_t,
+    point: &Point,
+) -> Result<&'a mut _lv_obj_t, LvError> {
     let mut current = ptr::null_mut();
     unsafe {
         'search: loop {
@@ -34,7 +37,7 @@ fn rec_get_frontmost<'a>(parent: &'a mut _lv_obj_t, point: &Point) -> Result<&'a
                     current = p as *mut _lv_obj_t;
                     let ptr: &'a mut _lv_obj_t = &mut *(current as *mut _lv_obj_t);
                     if contains(ptr, point)? {
-                        return rec_get_frontmost(ptr, point)
+                        return rec_get_frontmost(ptr, point);
                     }
                 }
             }
@@ -51,13 +54,12 @@ pub fn get_obj_at_pt<'a>(screen: &'a Obj, point: &Point) -> Option<&'a mut _lv_o
         let mut current: &'a mut _lv_obj_t = lv_obj_get_child(scr_raw, ptr::null_mut()).as_mut()?;
         'search: loop {
             if contains(current, point).ok()? {
-                return rec_get_frontmost(current, point).ok()
-            }
-            else {
+                return rec_get_frontmost(current, point).ok();
+            } else {
                 match lv_obj_get_child(scr_raw, current) as usize {
                     // lv_obj_get_child will return a null ptr if exhaustedd
                     0 => break 'search,
-                    child => current = &mut *(child as *mut _lv_obj_t)
+                    child => current = &mut *(child as *mut _lv_obj_t),
                 }
             }
         }

@@ -23,7 +23,7 @@ pub enum NavLocation {
 /// A GUI event to be processed in the main event loop.
 #[derive(Debug, Clone, Copy)]
 pub enum GuiEvent {
-    Navigate(NavLocation)
+    Navigate(NavLocation),
 }
 
 /// Loads the actual GUI on the display.
@@ -72,7 +72,7 @@ where
             println!("Clicked!");
             match tx.send(GuiEvent::Navigate(NavLocation::Terminal)) {
                 Ok(_) => (),
-                Err(e) => eprintln!("{e}")
+                Err(e) => eprintln!("{e}"),
             }
         }
     })?;
@@ -101,9 +101,9 @@ where
                         Ok(_) => (),
                         Err(e) => {
                             eprintln!("{e}");
-                            break 'running
+                            break 'running;
                         }
-                    }
+                    },
                     _ => {}
                 }
             }
@@ -121,7 +121,7 @@ where
                         NavLocation::Home => {
                             ui.load_scr(&mut screen)?;
                             current_scr = NavLocation::Home
-                        },
+                        }
                         NavLocation::Exit => break 'running,
                     }
                 }
