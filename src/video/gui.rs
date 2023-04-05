@@ -1,6 +1,7 @@
 use super::{term_ui, theme::MxTheme};
 use cstr_core::CString;
-use lvgl::{widgets, Align, Color, Display, Event, LvError, Part, Widget};
+use lvgl::{widgets, Align, Color, Display, Event, LvError, Part, Widget, lv_drv_input_pointer_sdl};
+use lvgl::input_device::InputDriver;
 use std::{sync::mpsc::channel, time::{Duration, Instant}, thread::sleep};
 
 /// Possible screens to which the UI can navigate. `Exit` represents quitting
@@ -23,6 +24,7 @@ pub fn load_gui(
     mut display: Display,
 ) -> Result<(), LvError>
 {
+    let _indev = lv_drv_input_pointer_sdl!(display);
     let theme = MxTheme::pmos_dark();
     let mut screen = display.get_scr_act()?;
     let mut scr_style = theme.style_window();

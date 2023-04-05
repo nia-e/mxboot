@@ -11,8 +11,8 @@ use syscalls::{
 
 mod video;
 
-const HOR_RES: u32 = 1920;
-const VER_RES: u32 = 1080;
+const HOR_RES: u32 = 480;
+const VER_RES: u32 = 480;
 
 /// Linux `reboot(2)` syscall magic for system restart.
 #[cfg(target_arch = "aarch64")]
