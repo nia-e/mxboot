@@ -19,15 +19,8 @@ pub enum GuiEvent {
 }
 
 /// Loads the actual GUI on the display.
-///
-/// # Safety
-///
-/// If the target is `aarch64`, `window` must be an object of type
-/// `embedded_graphics_simulator::Window`. This is not enforced by the
-/// typesystem as that would require pulling in `embedded_graphics_simulator`
-/// on `aarch64` builds, increasing executable size.
-pub unsafe fn load_gui(
-    display: Display,
+pub fn load_gui(
+    mut display: Display,
 ) -> Result<(), LvError>
 {
     let theme = MxTheme::pmos_dark();
@@ -68,9 +61,9 @@ pub unsafe fn load_gui(
                     match route {
                         NavLocation::Terminal => {
                             let mut term_screen = term_ui::term_ui(&theme, &tx)?;
-                            //ui.load_scr(&mut term_screen)?;
+                            display.set_scr_act(&mut term_screen)?;
                         }
-                        NavLocation::Home => (),//display.load_scr(&mut screen)?,
+                        NavLocation::Home => display.set_scr_act(&mut screen)?,
 
                         NavLocation::Exit => break 'running,
                     }

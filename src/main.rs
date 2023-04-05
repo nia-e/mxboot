@@ -20,14 +20,15 @@ const RB_AUTOBOOT: usize = 0x1234567;
 
 fn main() -> Result<()> {
     #[cfg(target_arch = "aarch64")]
-    match Framebuffer::new("/dev/FIXME") {
-        Ok(fb) => match video::init::init_fb(fb) {
-            Ok(_) => (),
-            Err(e) => eprintln!("{e}"),
-        },
-        Err(e) => {
-            eprintln!("{e}\nmxboot failed to initialize framebuffer. Booting previously set OS...")
-        }
+    match video::init::init_fb() {
+        Ok(_) => (),
+        Err(e) => eprintln!("{e}"),
+    }
+
+    #[cfg(not(target_arch = "aarch64"))]
+    match video::mock_init::init_disp() {
+        Ok(_) => (),
+        Err(e) => eprintln!("{e}"),
     }
 
     // Set boot as valid; if this fails, it's ok to carry on

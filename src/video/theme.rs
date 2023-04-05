@@ -5,10 +5,10 @@
 
 use lvgl::{
     style::{Opacity, Style},
-    Color, State,
+    Color,
 };
 
-#[repr(i16)]
+#[repr(u8)]
 enum BorderSide {
     None = 0x00,
     Bottom = 0x01,
@@ -156,99 +156,91 @@ impl MxTheme {
     /// Gets the style to be used on windows, given the current theme.
     pub fn style_window(&self) -> Style {
         let mut style = Style::default();
-        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
-        style.set_bg_color(State::DEFAULT, self.window.bg_color.clone());
+        style.set_bg_opa(Opacity::OPA_COVER);
+        style.set_bg_color(self.window.bg_color.clone());
         style
     }
 
     /// Gets the style to be used on the header, given the current theme.
     pub fn style_header(&self) -> Style {
         let mut style = Style::default();
-        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
-        style.set_bg_color(State::DEFAULT, self.header.bg_color.clone());
-        style.set_border_side(State::DEFAULT, BorderSide::Bottom as i16);
-        style.set_border_width(State::DEFAULT, self.header.border_width);
-        style.set_border_color(State::DEFAULT, self.header.border_color.clone());
-        style.set_pad_bottom(State::DEFAULT, self.header.pad);
-        style.set_pad_left(State::DEFAULT, self.header.pad);
-        style.set_pad_top(State::DEFAULT, self.header.pad);
-        style.set_pad_right(State::DEFAULT, self.header.pad);
-        style.set_margin_bottom(State::DEFAULT, self.header.gap);
-        style.set_margin_left(State::DEFAULT, self.header.gap);
-        style.set_margin_top(State::DEFAULT, self.header.gap);
-        style.set_margin_right(State::DEFAULT, self.header.gap);
+        style.set_bg_opa(Opacity::OPA_COVER);
+        style.set_bg_color(self.header.bg_color.clone());
+        style.set_border_side(BorderSide::Bottom as u8);
+        style.set_border_width(self.header.border_width);
+        style.set_border_color(self.header.border_color.clone());
+        style.set_pad_bottom(self.header.pad);
+        style.set_pad_left(self.header.pad);
+        style.set_pad_top(self.header.pad);
+        style.set_pad_right(self.header.pad);
         style
     }
 
     /// Gets the style to be used on the keyboard, given the current theme.
     pub fn style_keyboard(&self) -> Style {
         let mut style = Style::default();
-        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
-        style.set_bg_color(State::DEFAULT, self.keyboard.bg_color.clone());
-        style.set_border_side(State::DEFAULT, BorderSide::Top as i16);
-        style.set_border_width(State::DEFAULT, self.keyboard.border_width);
-        style.set_border_color(State::DEFAULT, self.keyboard.border_color.clone());
-        style.set_pad_bottom(State::DEFAULT, self.keyboard.pad);
-        style.set_pad_left(State::DEFAULT, self.keyboard.pad);
-        style.set_pad_top(State::DEFAULT, self.keyboard.pad);
-        style.set_pad_right(State::DEFAULT, self.keyboard.pad);
-        style.set_margin_bottom(State::DEFAULT, self.keyboard.gap);
-        style.set_margin_left(State::DEFAULT, self.keyboard.gap);
-        style.set_margin_top(State::DEFAULT, self.keyboard.gap);
-        style.set_margin_right(State::DEFAULT, self.keyboard.gap);
+        style.set_bg_opa(Opacity::OPA_COVER);
+        style.set_bg_color(self.keyboard.bg_color.clone());
+        style.set_border_side(BorderSide::Top as u8);
+        style.set_border_width(self.keyboard.border_width);
+        style.set_border_color(self.keyboard.border_color.clone());
+        style.set_pad_bottom(self.keyboard.pad);
+        style.set_pad_left(self.keyboard.pad);
+        style.set_pad_top(self.keyboard.pad);
+        style.set_pad_right(self.keyboard.pad);
         style
     }
 
     /// Gets the style to be used on keys, given the current theme.
     pub fn style_key(&self) -> Style {
         let mut style = Style::default();
-        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
-        style.set_border_side(State::DEFAULT, BorderSide::Full as i16);
-        style.set_border_width(State::DEFAULT, self.keyboard.keys.border_width);
-        style.set_radius(State::DEFAULT, self.keyboard.keys.corner_radius);
+        style.set_bg_opa(Opacity::OPA_COVER);
+        style.set_border_side(BorderSide::Full as u8);
+        style.set_border_width(self.keyboard.keys.border_width);
+        style.set_radius(self.keyboard.keys.corner_radius);
         style
     }
 
     /// Gets the style to be used on buttons, given the current theme.
     pub fn style_button(&self) -> Style {
         let mut style = Style::default();
-        style.set_text_color(State::DEFAULT, self.button.normal.fg_color.clone());
-        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
-        style.set_bg_color(State::DEFAULT, self.button.normal.bg_color.clone());
-        style.set_border_side(State::DEFAULT, BorderSide::Full as i16);
-        style.set_border_width(State::DEFAULT, self.button.border_width);
-        style.set_border_color(State::DEFAULT, self.button.normal.border_color.clone());
-        style.set_radius(State::DEFAULT, self.button.corner_radius);
-        style.set_pad_bottom(State::DEFAULT, self.button.pad);
-        style.set_pad_left(State::DEFAULT, self.button.pad);
-        style.set_pad_top(State::DEFAULT, self.button.pad);
-        style.set_pad_right(State::DEFAULT, self.button.pad);
+        style.set_text_color(self.button.normal.fg_color.clone());
+        style.set_bg_opa(Opacity::OPA_COVER);
+        style.set_bg_color(self.button.normal.bg_color.clone());
+        style.set_border_side(BorderSide::Full as u8);
+        style.set_border_width(self.button.border_width);
+        style.set_border_color(self.button.normal.border_color.clone());
+        style.set_radius(self.button.corner_radius);
+        style.set_pad_bottom(self.button.pad);
+        style.set_pad_left(self.button.pad);
+        style.set_pad_top(self.button.pad);
+        style.set_pad_right(self.button.pad);
         style
     }
 
     /// Gets the style to be used on pressed buttons, given the current theme.
     pub fn style_button_pressed(&self) -> Style {
         let mut style = Style::default();
-        style.set_text_color(State::DEFAULT, self.button.pressed.fg_color.clone());
-        style.set_bg_color(State::DEFAULT, self.button.pressed.bg_color.clone());
-        style.set_border_color(State::DEFAULT, self.button.pressed.border_color.clone());
+        style.set_text_color(self.button.pressed.fg_color.clone());
+        style.set_bg_color(self.button.pressed.bg_color.clone());
+        style.set_border_color(self.button.pressed.border_color.clone());
         style
     }
 
     /// Gets the style to be used on text areas, given the current theme.
     pub fn style_text_area(&self) -> Style {
         let mut style = Style::default();
-        style.set_text_color(State::DEFAULT, self.text_area.fg_color.clone());
-        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
-        style.set_bg_color(State::DEFAULT, self.text_area.bg_color.clone());
-        style.set_border_side(State::DEFAULT, BorderSide::Full as i16);
-        style.set_border_width(State::DEFAULT, self.text_area.border_width);
-        style.set_border_color(State::DEFAULT, self.text_area.border_color.clone());
-        style.set_radius(State::DEFAULT, self.text_area.corner_radius);
-        style.set_pad_bottom(State::DEFAULT, self.text_area.pad);
-        style.set_pad_left(State::DEFAULT, self.text_area.pad);
-        style.set_pad_top(State::DEFAULT, self.text_area.pad);
-        style.set_pad_right(State::DEFAULT, self.text_area.pad);
+        style.set_text_color(self.text_area.fg_color.clone());
+        style.set_bg_opa(Opacity::OPA_COVER);
+        style.set_bg_color(self.text_area.bg_color.clone());
+        style.set_border_side(BorderSide::Full as u8);
+        style.set_border_width(self.text_area.border_width);
+        style.set_border_color(self.text_area.border_color.clone());
+        style.set_radius(self.text_area.corner_radius);
+        style.set_pad_bottom(self.text_area.pad);
+        style.set_pad_left(self.text_area.pad);
+        style.set_pad_top(self.text_area.pad);
+        style.set_pad_right(self.text_area.pad);
         style
     }
 
@@ -256,7 +248,7 @@ impl MxTheme {
     /// theme.
     pub fn style_text_area_placeholder(&self) -> Style {
         let mut style = Style::default();
-        style.set_text_color(State::DEFAULT, self.text_area.placeholder_color.clone());
+        style.set_text_color(self.text_area.placeholder_color.clone());
         style
     }
 
@@ -264,29 +256,29 @@ impl MxTheme {
     /// theme.
     pub fn style_text_area_cursor(&self) -> Style {
         let mut style = Style::default();
-        style.set_border_side(State::DEFAULT, BorderSide::Left as i16);
-        style.set_border_width(State::DEFAULT, self.text_area.cursor.width);
-        style.set_border_color(State::DEFAULT, self.text_area.cursor.color.clone());
+        style.set_border_side(BorderSide::Left as u8);
+        style.set_border_width(self.text_area.cursor.width);
+        style.set_border_color(self.text_area.cursor.color.clone());
         style
     }
 
     /// Gets the style to be used on dropdown menys, given the current theme.
     pub fn style_dropdown(&self) -> Style {
         let mut style = Style::default();
-        style.set_text_color(State::DEFAULT, self.dropdown.button.normal.fg_color.clone());
-        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
-        style.set_bg_color(State::DEFAULT, self.dropdown.button.normal.bg_color.clone());
-        style.set_border_side(State::DEFAULT, BorderSide::Full as i16);
-        style.set_border_width(State::DEFAULT, self.dropdown.button.border_width);
+        style.set_text_color(self.dropdown.button.normal.fg_color.clone());
+        style.set_bg_opa(Opacity::OPA_COVER);
+        style.set_bg_color(self.dropdown.button.normal.bg_color.clone());
+        style.set_border_side(BorderSide::Full as u8);
+        style.set_border_width(self.dropdown.button.border_width);
         style.set_border_color(
-            State::DEFAULT,
+            
             self.dropdown.button.normal.border_color.clone(),
         );
-        style.set_radius(State::DEFAULT, self.dropdown.button.corner_radius);
-        style.set_pad_bottom(State::DEFAULT, self.dropdown.button.pad);
-        style.set_pad_left(State::DEFAULT, self.dropdown.button.pad);
-        style.set_pad_top(State::DEFAULT, self.dropdown.button.pad);
-        style.set_pad_right(State::DEFAULT, self.dropdown.button.pad);
+        style.set_radius(self.dropdown.button.corner_radius);
+        style.set_pad_bottom(self.dropdown.button.pad);
+        style.set_pad_left(self.dropdown.button.pad);
+        style.set_pad_top(self.dropdown.button.pad);
+        style.set_pad_right(self.dropdown.button.pad);
         style
     }
 
@@ -295,15 +287,15 @@ impl MxTheme {
     pub fn style_dropdown_pressed(&self) -> Style {
         let mut style = Style::default();
         style.set_text_color(
-            State::DEFAULT,
+            
             self.dropdown.button.pressed.fg_color.clone(),
         );
         style.set_bg_color(
-            State::DEFAULT,
+            
             self.dropdown.button.pressed.bg_color.clone(),
         );
         style.set_border_color(
-            State::DEFAULT,
+            
             self.dropdown.button.pressed.border_color.clone(),
         );
         style
@@ -313,17 +305,17 @@ impl MxTheme {
     /// theme.
     pub fn style_dropdown_list(&self) -> Style {
         let mut style = Style::default();
-        style.set_text_color(State::DEFAULT, self.dropdown.list.fg_color.clone());
-        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
-        style.set_bg_color(State::DEFAULT, self.dropdown.list.bg_color.clone());
-        style.set_border_side(State::DEFAULT, BorderSide::Full as i16);
-        style.set_border_width(State::DEFAULT, self.dropdown.list.border_width);
-        style.set_border_color(State::DEFAULT, self.dropdown.list.border_color.clone());
-        style.set_radius(State::DEFAULT, self.dropdown.list.corner_radius);
-        style.set_pad_bottom(State::DEFAULT, self.dropdown.list.pad);
-        style.set_pad_left(State::DEFAULT, self.dropdown.list.pad);
-        style.set_pad_top(State::DEFAULT, self.dropdown.list.pad);
-        style.set_pad_right(State::DEFAULT, self.dropdown.list.pad);
+        style.set_text_color(self.dropdown.list.fg_color.clone());
+        style.set_bg_opa(Opacity::OPA_COVER);
+        style.set_bg_color(self.dropdown.list.bg_color.clone());
+        style.set_border_side(BorderSide::Full as u8);
+        style.set_border_width(self.dropdown.list.border_width);
+        style.set_border_color(self.dropdown.list.border_color.clone());
+        style.set_radius(self.dropdown.list.corner_radius);
+        style.set_pad_bottom(self.dropdown.list.pad);
+        style.set_pad_left(self.dropdown.list.pad);
+        style.set_pad_top(self.dropdown.list.pad);
+        style.set_pad_right(self.dropdown.list.pad);
         style
     }
 
@@ -332,12 +324,12 @@ impl MxTheme {
     pub fn style_dropdown_list_selected(&self) -> Style {
         let mut style = Style::default();
         style.set_text_color(
-            State::DEFAULT,
+            
             self.dropdown.list.selection_fg_color.clone(),
         );
-        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
+        style.set_bg_opa(Opacity::OPA_COVER);
         style.set_bg_color(
-            State::DEFAULT,
+            
             self.dropdown.list.selection_bg_color.clone(),
         );
         style
@@ -346,24 +338,24 @@ impl MxTheme {
     /// Gets the style to be used on labels, given the current theme.
     pub fn style_label(&self) -> Style {
         let mut style = Style::default();
-        style.set_text_color(State::DEFAULT, self.label.fg_color.clone());
+        style.set_text_color(self.label.fg_color.clone());
         style
     }
 
     /// Gets the style to be used on message boxes, given the current theme.
     pub fn style_msgbox(&self) -> Style {
         let mut style = Style::default();
-        style.set_text_color(State::DEFAULT, self.msgbox.fg_color.clone());
-        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
-        style.set_bg_color(State::DEFAULT, self.msgbox.bg_color.clone());
-        style.set_border_side(State::DEFAULT, BorderSide::Full as i16);
-        style.set_border_width(State::DEFAULT, self.msgbox.border_width);
-        style.set_border_color(State::DEFAULT, self.msgbox.border_color.clone());
-        style.set_radius(State::DEFAULT, self.msgbox.corner_radius);
-        style.set_pad_bottom(State::DEFAULT, self.msgbox.pad);
-        style.set_pad_left(State::DEFAULT, self.msgbox.pad);
-        style.set_pad_top(State::DEFAULT, self.msgbox.pad);
-        style.set_pad_right(State::DEFAULT, self.msgbox.pad);
+        style.set_text_color(self.msgbox.fg_color.clone());
+        style.set_bg_opa(Opacity::OPA_COVER);
+        style.set_bg_color(self.msgbox.bg_color.clone());
+        style.set_border_side(BorderSide::Full as u8);
+        style.set_border_width(self.msgbox.border_width);
+        style.set_border_color(self.msgbox.border_color.clone());
+        style.set_radius(self.msgbox.corner_radius);
+        style.set_pad_bottom(self.msgbox.pad);
+        style.set_pad_left(self.msgbox.pad);
+        style.set_pad_top(self.msgbox.pad);
+        style.set_pad_right(self.msgbox.pad);
         style
     }
 
@@ -371,7 +363,7 @@ impl MxTheme {
     /// theme.
     pub fn style_msgbox_label(&self) -> Style {
         let mut style = Style::default();
-        style.set_pad_bottom(State::DEFAULT, self.msgbox.pad);
+        style.set_pad_bottom(self.msgbox.pad);
         style
     }
 
@@ -386,26 +378,26 @@ impl MxTheme {
     /// current theme.
     pub fn style_msgbox_background(&self) -> Style {
         let mut style = Style::default();
-        style.set_bg_color(State::DEFAULT, self.msgbox.dimming.color.clone());
-        style.set_bg_opa(State::DEFAULT, self.msgbox.dimming.opacity);
+        style.set_bg_color(self.msgbox.dimming.color.clone());
+        style.set_bg_opa(self.msgbox.dimming.opacity);
         style
     }
 
     /// Gets the style to be used on bars, given the current theme.
     pub fn style_bar(&self) -> Style {
         let mut style = Style::default();
-        style.set_border_side(State::DEFAULT, BorderSide::Full as i16);
-        style.set_border_width(State::DEFAULT, self.bar.border_width);
-        style.set_border_color(State::DEFAULT, self.bar.border_color.clone());
-        style.set_radius(State::DEFAULT, self.bar.corner_radius);
+        style.set_border_side(BorderSide::Full as u8);
+        style.set_border_width(self.bar.border_width);
+        style.set_border_color(self.bar.border_color.clone());
+        style.set_radius(self.bar.corner_radius);
         style
     }
 
     /// Gets the style to be used on bar indicators, given the current theme.
     pub fn style_bar_indicator(&self) -> Style {
         let mut style = Style::default();
-        style.set_bg_opa(State::DEFAULT, Opacity::OPA_COVER);
-        style.set_bg_color(State::DEFAULT, self.bar.indicator.bg_color.clone());
+        style.set_bg_opa(Opacity::OPA_COVER);
+        style.set_bg_color(self.bar.indicator.bg_color.clone());
         style
     }
 
