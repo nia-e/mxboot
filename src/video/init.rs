@@ -1,22 +1,19 @@
 #![cfg(target_arch = "aarch64")]
 
-use super::fb::DrawableFramebuffer;
 use super::gui::load_gui;
+use super::{HOR_RES, VER_RES};
 use anyhow::Result;
 use framebuffer::Framebuffer;
+use lvgl::DrawBuffer;
 
 /// Initialize the display, given a framebuffer device.
-pub fn init_fb(fb: Framebuffer) -> Result<()> {
-    let mut fb = DrawableFramebuffer::new(fb)?;
-    // Code Crimes(tm) have been done here to reduce executable size on aarch64
-    // so we don't pull in the embedded_graphics_simulator crate. The None is
-    // entirely unused.
-    unsafe {
-        match load_gui(fb, None::<u8>) {
-            Ok(_) => (),
-            Err(e) => {
-                eprintln!("{:?}", e);
-            }
+pub fn init_fb() -> Result<()> {
+    let buf = DrawBuffer::<{(HOR_RES * VER_RES / 10) as usize}>::default();
+    let mut fb = lvgl::lv_drv_disp_fbdev!(buf, HOR_RES, VER_RES);
+    match load_gui(fb) {
+        Ok(_) => (),
+        Err(e) => {
+            eprintln!("{:?}", e);
         }
     }
     Ok(())

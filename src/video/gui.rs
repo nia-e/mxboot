@@ -1,15 +1,7 @@
-#[cfg(not(target_arch = "aarch64"))]
-use embedded_graphics::pixelcolor::Rgb565;
-#[cfg(not(target_arch = "aarch64"))]
-use embedded_graphics_simulator::{SimulatorEvent, Window};
-#[cfg(not(target_arch = "aarch64"))]
-use std::mem::transmute;
-
-use super::{contains::get_obj_at_pt, term_ui, theme::MxTheme};
+use super::{term_ui, theme::MxTheme};
 use cstr_core::CString;
-use embedded_graphics::prelude::*;
-use lvgl::{widgets, Align, Color, Event, LvError, Part, Widget, UI};
-use std::{sync::mpsc::channel, time::Duration};
+use lvgl::{widgets, Align, Color, Display, Event, LvError, Part, Widget};
+use std::{sync::mpsc::channel, time::{Duration, Instant}, thread::sleep};
 
 /// Possible screens to which the UI can navigate. `Exit` represents quitting
 /// mxboot.
@@ -34,27 +26,25 @@ pub enum GuiEvent {
 /// `embedded_graphics_simulator::Window`. This is not enforced by the
 /// typesystem as that would require pulling in `embedded_graphics_simulator`
 /// on `aarch64` builds, increasing executable size.
-pub unsafe fn load_gui<D: DrawTarget + OriginDimensions, T>(
-    display: D,
-    mut window: Option<T>,
+pub unsafe fn load_gui(
+    display: Display,
 ) -> Result<(), LvError>
-where
-    <D as DrawTarget>::Color: From<Color>,
 {
-    let mut ui = UI::init()?;
-    ui.disp_drv_register(display)?;
     let theme = MxTheme::pmos_dark();
-    let mut screen = ui.scr_act()?;
-    screen.add_style(Part::Main, theme.style_window())?;
+    let mut screen = display.get_scr_act()?;
+    let mut scr_style = theme.style_window();
+    screen.add_style(Part::Main, &mut scr_style)?;
 
-    let mut button = widgets::Btn::new(&mut screen)?;
-    button.set_align(&mut screen, Align::InTopMid, 0, 0)?;
+    let mut button = widgets::Btn::create(&mut screen)?;
+    button.set_align(Align::TopMid, 0, 0)?;
     button.set_size(200, 100)?;
-    button.add_style(Part::Main, theme.style_button())?;
+    let mut btn_style = theme.style_button();
+    button.add_style(Part::Main, &mut btn_style)?;
 
-    let mut label = widgets::Label::new(&mut button)?;
+    let mut label = widgets::Label::create(&mut button)?;
     label.set_text(CString::new("Terminal").unwrap().as_c_str())?;
-    label.add_style(Part::Main, theme.style_label())?;
+    let mut label_style = theme.style_label();
+    label.add_style(Part::Main, &mut label_style)?;
 
     let (tx, rx) = channel::<GuiEvent>();
 
@@ -68,40 +58,9 @@ where
         }
     })?;
 
-    label.on_event(|_, event| ui.event_send(&mut button, event).unwrap())?;
-
     'running: loop {
-        ui.task_handler();
-        // Not proud of all the transmutes, but it's the only way to make this
-        // generic over simulated vs real displays without extensive code
-        // duplication which would probably be worse.
-        #[cfg(not(target_arch = "aarch64"))]
-        unsafe {
-            let w: &mut Window = transmute(window.as_mut().unwrap());
-            w.update::<Rgb565>(transmute(ui.get_display_ref().unwrap()));
-            for event in w.events() {
-                match event {
-                    SimulatorEvent::MouseButtonUp {
-                        mouse_btn: _,
-                        point,
-                    } => {
-                        if let Some(obj) = get_obj_at_pt(&ui.scr_act()?, &point) {
-                            // Unsure if this is ok. TODO: figure out if there's a better way to do this
-                            let mut w: widgets::Cont = Widget::from_raw(obj.into());
-                            ui.event_send(&mut w, Event::Clicked)?;
-                        }
-                    }
-                    SimulatorEvent::Quit => match tx.send(GuiEvent::Navigate(NavLocation::Exit)) {
-                        Ok(_) => (),
-                        Err(e) => {
-                            eprintln!("{e}");
-                            break 'running;
-                        }
-                    },
-                    _ => {}
-                }
-            }
-        }
+        let start = Instant::now();
+        lvgl::task_handler();
         while let Ok(event) = rx.try_recv() {
             match event {
                 GuiEvent::Navigate(route) => {
@@ -109,16 +68,17 @@ where
                     match route {
                         NavLocation::Terminal => {
                             let mut term_screen = term_ui::term_ui(&theme, &tx)?;
-                            ui.load_scr(&mut term_screen)?;
+                            //ui.load_scr(&mut term_screen)?;
                         }
-                        NavLocation::Home => ui.load_scr(&mut screen)?,
+                        NavLocation::Home => (),//display.load_scr(&mut screen)?,
 
                         NavLocation::Exit => break 'running,
                     }
                 }
             }
         }
-        ui.tick_inc(Duration::from_millis(16));
+        sleep(Duration::from_millis(15));
+        lvgl::tick_inc(Instant::now().duration_since(start));
     }
     Ok(())
 }

@@ -11,6 +11,9 @@ use syscalls::{
 
 mod video;
 
+const HOR_RES: u32 = 1920;
+const VER_RES: u32 = 1080;
+
 /// Linux `reboot(2)` syscall magic for system restart.
 #[cfg(target_arch = "aarch64")]
 const RB_AUTOBOOT: usize = 0x1234567;
@@ -25,10 +28,6 @@ fn main() -> Result<()> {
         Err(e) => {
             eprintln!("{e}\nmxboot failed to initialize framebuffer. Booting previously set OS...")
         }
-    }
-    #[cfg(not(target_arch = "aarch64"))]
-    if let Err(e) = video::mock_init::mock_init_fb() {
-        eprintln!("{:?}", e);
     }
 
     // Set boot as valid; if this fails, it's ok to carry on

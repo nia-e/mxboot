@@ -20,8 +20,8 @@ pub unsafe fn term_ui(theme: &MxTheme, tx: &Sender<GuiEvent>) -> Result<Obj, LvE
         Obj::from_raw(ptr::NonNull::new(lv_obj_create(ptr::null_mut(), ptr::null_mut())).unwrap());
     screen.add_style(Part::Main, theme.style_window())?;
 
-    let mut kb = widgets::Keyboard::new(&mut screen)?;
-    kb.set_align(&mut screen, Align::InBottomMid, 0, 0)?;
+    let mut kb = widgets::Keyboard::create(&mut screen)?;
+    kb.set_align(Align::BottomMid, 0, 0)?;
     kb.set_size(1080, 540).unwrap();
     kb.add_style(Part::Main, theme.style_keyboard()).unwrap();
     kb.set_cursor_manage(true)?;
